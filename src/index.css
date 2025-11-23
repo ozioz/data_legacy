@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-white font-mono;
+  }
+}
+
+.neon-text {
+  text-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
+}
+
+.neon-border {
+  box-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
+}

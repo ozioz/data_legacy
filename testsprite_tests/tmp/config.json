@@ -1,0 +1,16 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:5173",
+  "executionArgs": {
+    "projectName": "datalegacy",
+    "projectPath": "C:\\Users\\Asus\\OneDrive\\Desktop\\AntiGravity_Projects\\datalegacy",
+    "testIds": [],
+    "additionalInstruction": "This is a React SPA with client-side routing. MUST use browser automation (Playwright) to interact with UI elements. DO NOT use HTTP requests to routes like /path-selection or /career-map - these are React state-based screens, not server routes. All screens are rendered on the root URL (/) via React state changes. Use CSS selectors and text content to verify UI elements appear/disappear.",
+    "envs": {
+      "API_KEY": "sk-user-Lk0yEfsjHx7qA2BhFZAmb9SqeUrD1Q5db43cJbWE-9upqe3jee8bHsHglH-FR2KkdL9YgVmgl3JtR8fl8xlA8bLCF7rbKqrj4WuLfoovr47u_HvfzhCoj7HGLTkg2y2uNkM"
+    }
+  },
+  "proxy": "http://8e831aea-ae2b-4e10-a738-fc4cb42fa320:FmFBNeGgG6gXugbH4SSVRYEn8YRSvK6x@tun.testsprite.com:8080"
+}

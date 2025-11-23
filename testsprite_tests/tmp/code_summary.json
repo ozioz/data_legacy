@@ -1,0 +1,385 @@
+{
+  "tech_stack": [
+    "JavaScript",
+    "React",
+    "Vite",
+    "Tailwind CSS",
+    "Lucide React"
+  ],
+  "application_type": "Frontend Single Page Application (SPA)",
+  "routing_type": "Client-side routing (React state-based, no server routes)",
+  "testing_requirements": {
+    "test_method": "Browser Automation (Playwright/Selenium required)",
+    "note": "This is a React SPA with client-side routing. All navigation is handled by React state, not server routes. Tests MUST use browser automation to interact with UI elements. HTTP requests to routes like /path-selection or /career-map will return 404 because these are not server routes.",
+    "base_url": "http://localhost:5173",
+    "entry_point": "/ (root path only - all other routes are client-side)"
+  },
+  "features": [
+    {
+      "name": "Hero Selection",
+      "description": "User selects their career path (Data Engineer, Data Scientist, or BI Analyst). This is the initial screen at root URL.",
+      "files": [
+        "src/components/HeroSelection.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "data_engineer": "text=Data Engineer or [contains(text(), 'Data Engineer')]",
+          "data_scientist": "text=Data Scientist or [contains(text(), 'Data Scientist')]",
+          "bi_analyst": "text=BI Analyst or [contains(text(), 'BI Analyst')]"
+        },
+        "interaction": "Click on career card to select"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Hero Selection Feature",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Hero Selection Screen - Root URL",
+              "description": "Initial screen displaying three career options. Use browser automation to interact with UI elements.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with React app. Must use browser automation to verify UI elements."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Path Selection",
+      "description": "User chooses between Technical Mastery or Soft Skills & Leadership path. Appears after hero selection via React state change.",
+      "files": [
+        "src/components/PathSelection.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "technical_path": "text=Technical Mastery or [contains(text(), 'Technical')]",
+          "behavioral_path": "text=Soft Skills & Leadership or [contains(text(), 'Behavioral')] or [contains(text(), 'Soft Skills')]"
+        },
+        "interaction": "Click on path card to select",
+        "note": "This screen is rendered by React state, not a server route. Cannot access via HTTP GET /path-selection"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Path Selection Feature",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Path Selection Screen - Same root URL, different React state",
+              "description": "After selecting hero, React state changes to show path selection. Use browser automation to verify UI appears.",
+              "responses": {
+                "200": {
+                  "description": "Same HTML page, but React renders Path Selection component. Must use browser automation."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Career Map",
+      "description": "Displays unlocked levels in a winding path visualization. Rendered by React after path selection.",
+      "files": [
+        "src/components/CareerMap.jsx",
+        "src/App.jsx",
+        "src/utils/GameState.js"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "level_nodes": "[class*='rounded-full'] or button[contains(@class, 'w-24')]",
+          "unlocked_levels": "button:not([disabled])",
+          "locked_levels": "button[disabled] or [class*='grayscale']"
+        },
+        "interaction": "Click on unlocked level node to start game"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Career Map Feature",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Career Map Screen - Same root URL, React state shows map",
+              "description": "After path selection, React renders Career Map. Use browser automation to interact with level nodes.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with Career Map component rendered. Must use browser automation."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Pipeline Puzzle Game",
+      "description": "Logic puzzle game where players connect data pipeline components in correct sequence",
+      "files": [
+        "src/components/PipelinePuzzle.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "pipeline_slots": "[class*='border-2'] or div[onclick]",
+          "inventory_items": "button[contains(@class, 'bg-slate-700')]",
+          "execute_button": "button:has-text('RUN PIPELINE') or button:has-text('EXECUTE')"
+        },
+        "interaction": "Click inventory items to fill slots, click execute to validate"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Pipeline Puzzle Game",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Pipeline Puzzle Game - Rendered by React state",
+              "description": "Game appears after selecting level from Career Map. Use browser automation to interact with game UI.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with Pipeline Puzzle game rendered. Must use browser automation."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Null Runner Game",
+      "description": "Action game where players collect signals (green) and avoid noise (red) in lanes",
+      "files": [
+        "src/components/NullRunner.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "game_container": "[class*='bg-gray-800'] or [class*='h-[600px]']",
+          "start_button": "button:has-text('START RUN') or button:has-text('START')",
+          "health_display": "[class*='Heart'] or text=/\\d+ HP/",
+          "score_display": "text=/\\d+ \\/ \\d+/"
+        },
+        "interaction": "Click start, use arrow keys or click zones to move lanes"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Null Runner Game",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Null Runner Game - Rendered by React state",
+              "description": "Game appears after level selection. Use browser automation to interact with game.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with Null Runner game. Must use browser automation."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Query Master Game",
+      "description": "Word puzzle game where players build SQL queries by selecting correct blocks",
+      "files": [
+        "src/components/QueryMaster.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "query_blocks": "button[contains(@class, 'bg-slate-700')] or button[contains(@class, 'bg-blue-600')]",
+          "selected_blocks_area": "[class*='bg-black'] or [class*='font-mono']",
+          "run_button": "button:has-text('RUN QUERY')"
+        },
+        "interaction": "Click blocks to add to query, click run to execute"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Query Master Game",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Query Master Game - Rendered by React state",
+              "description": "Game appears after level selection. Use browser automation to build queries.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with Query Master game. Must use browser automation."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Data Farm Game",
+      "description": "Idle game where players plant and harvest data plots to reach target",
+      "files": [
+        "src/components/DataFarm.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "farm_plots": "[class*='aspect-square'] or div[onclick]",
+          "harvest_counter": "text=/\\d+ \\/ \\d+ TB/",
+          "empty_plot": "[class*='CloudRain'] or [class*='EMPTY']",
+          "ready_plot": "[class*='Database'] or [class*='READY']"
+        },
+        "interaction": "Click empty plots to plant, click ready plots to harvest"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Data Farm Game",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Data Farm Game - Rendered by React state",
+              "description": "Game appears after level selection. Use browser automation to interact with plots.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with Data Farm game. Must use browser automation."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Server Guardian Game",
+      "description": "Tower defense game where players deploy defenses to protect database from bugs",
+      "files": [
+        "src/components/ServerGuardian.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "tower_placement_zones": "[class*='border-dashed'] or [onclick]",
+          "energy_display": "text=/\\d+/ with 'Zap' icon",
+          "health_display": "text=/\\d+ HP/",
+          "enemies": "[class*='bg-red-500'] or [class*='Bug']"
+        },
+        "interaction": "Click tower zones to place towers, wait for enemies"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Server Guardian Game",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Server Guardian Game - Rendered by React state",
+              "description": "Game appears after level selection. Use browser automation to place towers.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with Server Guardian game. Must use browser automation."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Behavioral Game",
+      "description": "RPG scenario decision game where players make professional choices in workplace situations",
+      "files": [
+        "src/components/BehavioralGame.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "scenario_text": "[class*='bg-slate-900'] or p[contains(text(), 'scenario')]",
+          "choice_buttons": "button:has-text('A') or button:has-text('B') or button:has-text('C')",
+          "feedback_area": "[class*='bg-slate-800'] or [class*='border-green-500']"
+        },
+        "interaction": "Read scenario, click choice button (A, B, or C), read feedback"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Behavioral Game",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Behavioral Game - Rendered by React state",
+              "description": "Game appears after selecting behavioral level. Use browser automation to make decisions.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with Behavioral game. Must use browser automation."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Story Modal",
+      "description": "Educational modal system showing mission briefing before games and impact reports after completion",
+      "files": [
+        "src/components/StoryModal.jsx",
+        "src/App.jsx"
+      ],
+      "ui_elements": {
+        "selectors": {
+          "modal_overlay": "[class*='fixed inset-0'] or [class*='backdrop-blur']",
+          "briefing_text": "text='MISSION BRIEFING' or [contains(text(), 'briefing')]",
+          "impact_text": "text='MISSION COMPLETE' or [contains(text(), 'impact')]",
+          "start_button": "button:has-text('START MISSION')",
+          "return_button": "button:has-text('RETURN TO HQ')"
+        },
+        "interaction": "Modal appears automatically, click button to proceed"
+      },
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Story Modal Feature",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "Story Modal - Overlay component rendered by React",
+              "description": "Modal appears as overlay on same page. Use browser automation to verify modal content and interact.",
+              "responses": {
+                "200": {
+                  "description": "HTML page with modal overlay. Must use browser automation to verify modal."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

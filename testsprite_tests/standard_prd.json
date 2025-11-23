@@ -1,0 +1,329 @@
+{
+  "meta": {
+    "project": "Data Career Gamification Platform",
+    "date": "2025-11-19",
+    "prepared_by": "Software Development Manager"
+  },
+  "product_overview": "An interactive gamified platform designed to guide users through various data career paths, combining educational content with engaging games that develop both technical and behavioral skills for data professionals.",
+  "core_goals": [
+    "Provide users with a clear and engaging way to explore different data career paths including Data Engineer, Data Scientist, and BI Analyst.",
+    "Enable users to choose and progress through specialized career development tracks focusing on Technical Mastery or Soft Skills & Leadership.",
+    "Offer diverse interactive games that teach and reinforce data-related skills such as pipeline building, SQL querying, data management, and professional decision-making.",
+    "Visualize user progress through an intuitive career map that reflects unlocked levels and achievements.",
+    "Educate users via story modals that set the context before games and provide feedback and impact reports after completion."
+  ],
+  "key_features": [
+    "Hero Selection screen allowing users to select their desired data career path.",
+    "Path Selection screen presenting options between Technical Mastery and Soft Skills & Leadership tracks.",
+    "Career Map visualization displaying unlocked levels and progress in a winding career path format.",
+    "Pipeline Puzzle Game challenging users to connect data pipeline components correctly to build workflows.",
+    "Null Runner Action Game where players collect beneficial signals and avoid noise to hone quick decision skills.",
+    "Query Master Word Puzzle Game focused on constructing SQL queries by selecting the correct blocks.",
+    "Data Farm Idle Game that simulates planting and harvesting data plots to meet targets.",
+    "Server Guardian Tower Defense Game where players protect a database from bugs by deploying defenses strategically.",
+    "Behavioral RPG Scenario Game where players navigate professional workplace choices to improve soft skills and leadership.",
+    "Story Modal system providing educational mission briefings before games and impact reports after game completion."
+  ],
+  "user_flow_summary": [
+    "User lands on Hero Selection screen to choose their career path.",
+    "User proceeds to Path Selection to select between Technical or Behavioral development tracks.",
+    "User accesses the Career Map to view unlocked levels and available challenges.",
+    "User selects individual games (Pipeline Puzzle, Null Runner, Query Master, Data Farm, Server Guardian, Behavioral) based on career path and track.",
+    "Before starting a game, the Story Modal presents a mission briefing to provide context.",
+    "User plays the selected game, completing puzzles or challenges related to their career development.",
+    "Upon game completion, Story Modal displays an impact report summarizing user performance and learning outcomes.",
+    "User advances through career map levels unlocking new games and features as they progress."
+  ],
+  "validation_criteria": [
+    "All career paths (Data Engineer, Data Scientist, BI Analyst) and their respective selection interface display correctly and function as expected.",
+    "Path Selection correctly shows two track options and records user choice accurately.",
+    "Career Map accurately reflects unlocked levels corresponding to user progress without errors.",
+    "Each mini-game loads successfully, runs without crashes, and provides appropriate game mechanics as designed.",
+    "Story Modals display properly before and after games, giving clear mission briefings and impact reports.",
+    "User progress is saved and reflected accurately within the Career Map and subsequent game availability.",
+    "UI is consistent, responsive, and accessible across supported devices and screen sizes.",
+    "APIs for screens and game interactions perform within acceptable response times and handle errors gracefully."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "JavaScript",
+      "React",
+      "Vite",
+      "Tailwind CSS",
+      "Lucide React"
+    ],
+    "features": [
+      {
+        "name": "Hero Selection",
+        "description": "User selects their career path (Data Engineer, Data Scientist, or BI Analyst)",
+        "files": [
+          "src/components/HeroSelection.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Hero Selection Feature",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/": {
+              "get": {
+                "summary": "Hero Selection Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays hero selection interface with 3 career options"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Path Selection",
+        "description": "User chooses between Technical Mastery or Soft Skills & Leadership path",
+        "files": [
+          "src/components/PathSelection.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Path Selection Feature",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/path-selection": {
+              "get": {
+                "summary": "Path Selection Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays two path options: Technical or Behavioral"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Career Map",
+        "description": "Displays unlocked levels in a winding path visualization for selected career and path",
+        "files": [
+          "src/components/CareerMap.jsx",
+          "src/App.jsx",
+          "src/utils/GameState.js"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Career Map Feature",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/career-map": {
+              "get": {
+                "summary": "Career Map Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays career map with unlocked levels"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Pipeline Puzzle Game",
+        "description": "Logic puzzle game where players connect data pipeline components in correct sequence",
+        "files": [
+          "src/components/PipelinePuzzle.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Pipeline Puzzle Game",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/game/pipeline": {
+              "get": {
+                "summary": "Pipeline Puzzle Game Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays pipeline puzzle game interface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Null Runner Game",
+        "description": "Action game where players collect signals (green) and avoid noise (red) in lanes",
+        "files": [
+          "src/components/NullRunner.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Null Runner Game",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/game/runner": {
+              "get": {
+                "summary": "Null Runner Game Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays runner game interface with lanes and objects"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Query Master Game",
+        "description": "Word puzzle game where players build SQL queries by selecting correct blocks",
+        "files": [
+          "src/components/QueryMaster.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Query Master Game",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/game/query": {
+              "get": {
+                "summary": "Query Master Game Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays query building game interface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Data Farm Game",
+        "description": "Idle game where players plant and harvest data plots to reach target",
+        "files": [
+          "src/components/DataFarm.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Data Farm Game",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/game/farm": {
+              "get": {
+                "summary": "Data Farm Game Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays data farm game interface with plots"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Server Guardian Game",
+        "description": "Tower defense game where players deploy defenses to protect database from bugs",
+        "files": [
+          "src/components/ServerGuardian.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Server Guardian Game",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/game/tower": {
+              "get": {
+                "summary": "Server Guardian Game Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays tower defense game interface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Behavioral Game",
+        "description": "RPG scenario decision game where players make professional choices in workplace situations",
+        "files": [
+          "src/components/BehavioralGame.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Behavioral Game",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/game/behavioral": {
+              "get": {
+                "summary": "Behavioral Game Screen",
+                "responses": {
+                  "200": {
+                    "description": "Displays behavioral scenario decision game interface"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Story Modal",
+        "description": "Educational modal system showing mission briefing before games and impact reports after completion",
+        "files": [
+          "src/components/StoryModal.jsx",
+          "src/App.jsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "info": {
+            "title": "Story Modal Feature",
+            "version": "1.0.0"
+          },
+          "paths": {
+            "/modal/story": {
+              "get": {
+                "summary": "Story Modal Display",
+                "responses": {
+                  "200": {
+                    "description": "Displays educational story modal with briefing or debriefing"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
