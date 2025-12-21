@@ -1,0 +1,39 @@
+# Netlify Configuration for Data Legacy 2.0
+# Next.js 14 App Router with Server Actions
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+  
+# Next.js 14 App Router için @netlify/plugin-nextjs plugin'i gerekli
+# Netlify Dashboard → Plugins → "@netlify/plugin-nextjs" ekleyin
+# Plugin otomatik olarak routing'i handle eder, manuel redirect gerekmez
+
+# Next.js 14 requires Node.js 18+
+[build.environment]
+  NODE_VERSION = "18.20.0"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache static assets
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache images
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Market News Ticker Animation */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 30s linear infinite;
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-white font-mono;
+  }
+}
+
+.neon-text {
+  text-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
+}
+
+.neon-border {
+  box-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
+}
+
