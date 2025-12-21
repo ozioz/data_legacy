@@ -5,6 +5,9 @@ const nextConfig = {
     domains: [],
     unoptimized: true, // For static assets
   },
+  // Netlify için output ayarı (Next.js 14 App Router)
+  // Standalone mode Netlify'da daha iyi çalışır
+  output: 'standalone',
   // CSP headers moved to middleware.ts for better control
   // async headers() {
   //   return [
