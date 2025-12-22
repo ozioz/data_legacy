@@ -22,12 +22,27 @@ Built with Next.js 14, Supabase, and Groq AI (Llama 3) for extreme low-latency A
 ### Admin-Only Modules (In Progress - Development Phase)
 ⚠️ **Note**: The following modules are currently in development and only accessible to admin users. They will be made public once development is complete:
 - 🚧 **The Core**: Math & Algorithms training ground with educational puzzle games
+  - Matrix Architecture: Neural network layer connection puzzle
+  - Gradient Descent: Learning rate optimization simulator
 - 🚧 **Guilds**: Create/join guilds, compete on leaderboards
+  - Guild creation and management
+  - Guild leaderboards (sum of members' XP)
+  - Join/Leave functionality
 - 🚧 **Marketplace**: Buy/sell Data Farm resources, live price tracking
+  - Buy/sell transactions with secure RPC functions
+  - Live price tracking (simulated)
+  - Inventory management
+  - Quant Tools: Statistics learning mini-games
+  - Dynamic Market News: AI-generated headlines affecting prices
 - 🚧 **Profile & Resume**: User profile management and resume generation
+  - User persona analysis from game data
+  - PDF resume generation with verification link
+  - Skills ranking and soft skills assessment
 - 🚧 **Public Verification**: Shareable profile verification pages
+  - Public profile page (`/verify/[userId]`)
+  - Verified badge and read-only stats
 
-**Access Control**: These modules are protected by server-side admin checks in their layout files. Only users with `is_admin = true` in the `public.users` table can access them.
+**Access Control**: These modules are protected by server-side admin checks in their layout files (`app/*/layout.tsx`). Only users with `is_admin = true` in the `public.users` table can access them. Navigation shows these modules with an "In Progress" badge for admin users only.
 
 ### AI Mock Interview
 - **Multi-language Support**: Turkish, English, Spanish, French, German

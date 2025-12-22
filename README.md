@@ -165,8 +165,10 @@ AI prompt mühendisliği becerilerinizi test edin:
 
 1. **Visionary** 🎨
    - Görüntü prompt'larını reverse engineer edin
-   - AI'nın nasıl düşündüğünü anlayın
-   - Semantic similarity skorları alın
+   - **Zero-Latency**: Database validation (AI maliyeti yok!)
+   - Prompt Builder UI (Subject, Style, Lighting seçimi)
+   - Her doğru attribute = 33.33 puan
+   - Zorluk seviyeleri: Easy, Medium, Hard
 
 2. **Agent Handler** 🤖
    - AI agent araç zincirleri oluşturun
