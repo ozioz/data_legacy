@@ -4,23 +4,20 @@
 [build]
   command = "npm run build"
   publish = ".next"
-  
-# CRITICAL: Next.js 14 App Router requires @netlify/plugin-nextjs
-# Install via Netlify Dashboard → Plugins → Add "@netlify/plugin-nextjs"
-# OR add to package.json: "@netlify/plugin-nextjs": "^8.0.0"
 
 # Next.js 14 requires Node.js 18+
 [build.environment]
   NODE_VERSION = "18.20.0"
   NPM_FLAGS = "--legacy-peer-deps"
 
-# Next.js 14 App Router için özel yapılandırma
-# Plugin otomatik olarak routing'i handle eder
-# Manuel redirect gerekmez
+# CRITICAL: Enable the Netlify Next.js plugin for proper Next.js 14 App Router support
+# This handles SSR, routing, image optimization, and all Next.js features
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
+# Functions configuration - the Netlify Next.js plugin handles bundling automatically
 [functions]
   node_bundler = "esbuild"
-  included_files = [".next/**"]
 
 # Headers for security
 [[headers]]
