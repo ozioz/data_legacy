@@ -9,8 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'neon-green': '#0f0',
-        'neon-blue': '#00f',
+        'neon-green': '#00ff00',
+        'neon-blue': '#00d9ff',
       },
     },
   },

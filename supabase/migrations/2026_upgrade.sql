@@ -58,9 +58,12 @@ CREATE INDEX IF NOT EXISTS idx_raid_contributions_user_id ON public.raid_contrib
 CREATE INDEX IF NOT EXISTS idx_raid_contributions_damage ON public.raid_contributions(damage_dealt DESC);
 
 -- =====================================================
--- 3. DYNAMIC MARKET
+-- 3. DYNAMIC MARKET - REMOVED: Focus on Data Career Simulation
 -- =====================================================
+-- NOTE: Marketplace features have been removed to focus strictly on Data Professional Career Simulation.
+-- These tables are commented out for future migration cleanup.
 
+/*
 -- Table: market_news
 -- Stores market news events that affect prices
 CREATE TABLE IF NOT EXISTS public.market_news (
@@ -96,6 +99,7 @@ CREATE INDEX IF NOT EXISTS idx_market_news_created_at ON public.market_news(crea
 
 -- Index for volatility_index
 CREATE INDEX IF NOT EXISTS idx_market_listings_volatility ON public.market_listings(volatility_index DESC);
+*/
 
 -- =====================================================
 -- 4. USER MEMORY (LONG-TERM)
@@ -133,7 +137,7 @@ WITH (m = 16, ef_construction = 64);
 -- Enable RLS on all new tables
 ALTER TABLE public.guild_raids ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.raid_contributions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.market_news ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.market_news ENABLE ROW LEVEL SECURITY; -- COMMENTED OUT (Marketplace removed)
 ALTER TABLE public.user_memory ENABLE ROW LEVEL SECURITY;
 
 -- =====================================================
@@ -205,9 +209,9 @@ CREATE POLICY "Users can update their own contributions" ON public.raid_contribu
     USING (auth.uid() = user_id);
 
 -- =====================================================
--- Market News Policies
+-- Market News Policies - COMMENTED OUT (Marketplace removed)
 -- =====================================================
-
+/*
 -- Anyone can view market news
 DROP POLICY IF EXISTS "Anyone can view market news" ON public.market_news;
 CREATE POLICY "Anyone can view market news" ON public.market_news
@@ -225,6 +229,7 @@ DROP POLICY IF EXISTS "Authenticated users can update market news" ON public.mar
 CREATE POLICY "Authenticated users can update market news" ON public.market_news
     FOR UPDATE
     USING (auth.role() = 'authenticated');
+*/
 
 -- =====================================================
 -- User Memory Policies
@@ -280,11 +285,14 @@ CREATE TRIGGER update_raid_contributions_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
+-- COMMENTED OUT (Marketplace removed)
+/*
 DROP TRIGGER IF EXISTS update_market_news_updated_at ON public.market_news;
 CREATE TRIGGER update_market_news_updated_at
     BEFORE UPDATE ON public.market_news
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
+*/
 
 DROP TRIGGER IF EXISTS update_user_memory_updated_at ON public.user_memory;
 CREATE TRIGGER update_user_memory_updated_at
@@ -339,8 +347,8 @@ LEFT JOIN auth.users u ON u.id = rc.user_id
 GROUP BY rc.raid_id, gr.boss_name, rc.user_id, u.email
 ORDER BY total_damage DESC;
 
--- View: active_market_news
--- Shows currently active market news
+-- View: active_market_news - COMMENTED OUT (Marketplace removed)
+/*
 CREATE OR REPLACE VIEW public.active_market_news AS
 SELECT 
     id,
@@ -353,6 +361,7 @@ FROM public.market_news
 WHERE is_active = true 
 AND (expires_at IS NULL OR expires_at > NOW())
 ORDER BY created_at DESC;
+*/
 
 -- =====================================================
 -- 8. HELPER FUNCTIONS

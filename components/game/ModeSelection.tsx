@@ -7,9 +7,9 @@ export default function ModeSelection() {
   const { setGameState } = useGameStore()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex flex-col items-center justify-center p-4 relative overflow-hidden py-8 md:py-12">
       {/* Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
       </div>
@@ -52,7 +52,7 @@ export default function ModeSelection() {
             </div>
           </button>
 
-          {/* Prompt Lab */}
+          {/* Quick Play */}
           <a
             href="/arcade"
             className="group relative bg-slate-800/90 backdrop-blur-xl border-2 border-purple-500/50 rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-10 hover:border-purple-400 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl overflow-hidden h-full block"
@@ -65,14 +65,14 @@ export default function ModeSelection() {
                 <Sparkles size={32} className="md:w-10 md:h-10 lg:w-12 lg:h-12 text-white" />
               </div>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4 text-center group-hover:text-purple-400 transition-colors">
-                PROMPT LAB
+                QUICK PLAY
               </h2>
               <p className="text-gray-400 text-sm md:text-base lg:text-lg mb-4 md:mb-6 leading-relaxed flex-grow">
-                Quick-play reverse engineering games. Master AI prompts, agent chains, and strategic thinking. No career path required.
+                Instant games - no career required. Master AI prompts, agent chains, and strategic thinking through quick challenges.
               </p>
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-auto">
                 <div className="inline-flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm md:text-base lg:text-lg mx-auto">
-                  ENTER LAB <ArrowRight size={18} className="md:w-5 md:h-5" />
+                  PLAY NOW <ArrowRight size={18} className="md:w-5 md:h-5" />
                 </div>
               </div>
             </div>

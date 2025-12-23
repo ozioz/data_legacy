@@ -144,3 +144,84 @@ DROP TRIGGER IF EXISTS update_users_updated_at ON public.users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON public.users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- User Aptitude Metrics table (for AI Career Coach - Phase 2)
+CREATE TABLE IF NOT EXISTS public.user_aptitude_metrics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    session_id UUID REFERENCES public.game_sessions(id) ON DELETE SET NULL,
+    
+    -- Metrics (0-100 scale)
+    coding_speed INTEGER CHECK (coding_speed >= 0 AND coding_speed <= 100),
+    analytical_thinking INTEGER CHECK (analytical_thinking >= 0 AND analytical_thinking <= 100),
+    crisis_management INTEGER CHECK (crisis_management >= 0 AND crisis_management <= 100),
+    
+    -- AI Inference
+    suggested_role TEXT CHECK (suggested_role IN ('Data Engineer', 'Data Scientist', 'BI Analyst', 'Analytics Engineer')),
+    ai_observation TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for user_aptitude_metrics
+CREATE INDEX IF NOT EXISTS idx_user_aptitude_metrics_user_id ON public.user_aptitude_metrics(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_aptitude_metrics_created_at ON public.user_aptitude_metrics(created_at DESC);
+
+-- RLS for user_aptitude_metrics
+ALTER TABLE public.user_aptitude_metrics ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own aptitude metrics" ON public.user_aptitude_metrics;
+CREATE POLICY "Users can view own aptitude metrics"
+    ON public.user_aptitude_metrics FOR SELECT
+    USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Service role can insert aptitude metrics" ON public.user_aptitude_metrics;
+CREATE POLICY "Service role can insert aptitude metrics"
+    ON public.user_aptitude_metrics FOR INSERT
+    WITH CHECK (true); -- Server-side only via service role
+
+-- Career Progress table (Startup Saga - Company State)
+CREATE TABLE IF NOT EXISTS public.career_progress (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE UNIQUE,
+    
+    -- Company State Metrics
+    infrastructure_health INTEGER DEFAULT 100 CHECK (infrastructure_health >= 0 AND infrastructure_health <= 100),
+    budget INTEGER DEFAULT 0, -- Currency earned from games
+    reputation INTEGER DEFAULT 0 CHECK (reputation >= 0 AND reputation <= 100), -- Soft skills score
+    current_sprint INTEGER DEFAULT 1, -- Level/Sprint indicator
+    
+    -- Resource Carry-Over (for next game)
+    data_quality_score INTEGER DEFAULT 0 CHECK (data_quality_score >= 0 AND data_quality_score <= 100),
+    last_game_type TEXT CHECK (last_game_type IN ('PIPELINE', 'RUNNER', 'QUERY', 'FARM', 'TOWER', 'BEHAVIORAL')),
+    last_game_score INTEGER DEFAULT 0,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for career_progress
+CREATE INDEX IF NOT EXISTS idx_career_progress_user_id ON public.career_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_career_progress_current_sprint ON public.career_progress(current_sprint);
+
+-- RLS for career_progress
+ALTER TABLE public.career_progress ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own career progress" ON public.career_progress;
+CREATE POLICY "Users can view own career progress"
+    ON public.career_progress FOR SELECT
+    USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own career progress" ON public.career_progress;
+CREATE POLICY "Users can update own career progress"
+    ON public.career_progress FOR UPDATE
+    USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own career progress" ON public.career_progress;
+CREATE POLICY "Users can insert own career progress"
+    ON public.career_progress FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+-- Trigger to auto-update updated_at for career_progress
+DROP TRIGGER IF EXISTS update_career_progress_updated_at ON public.career_progress;
+CREATE TRIGGER update_career_progress_updated_at BEFORE UPDATE ON public.career_progress
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+

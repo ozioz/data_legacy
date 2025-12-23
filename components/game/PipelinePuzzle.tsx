@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import { ITEMS, MASCOTS, GAME_STORIES, GAME_TYPES } from '@/lib/game/constants'
 import { ArrowRight, Play, ArrowLeft } from 'lucide-react'
 import StoryModal from '@/components/ui/StoryModal'
+import VirtualCTO from '@/components/ui/VirtualCTO'
 import { saveGameSession } from '@/app/actions/game-actions'
+import { useGameStore } from '@/lib/store/game-store'
 
 interface PipelinePuzzleProps {
   level: any
@@ -26,8 +28,15 @@ export default function PipelinePuzzle({
   const [slots, setSlots] = useState<(string | null)[]>(Array(correctSequence.length).fill(null))
   const [status, setStatus] = useState<'IDLE' | 'SUCCESS' | 'ERROR'>('IDLE')
   const [message, setMessage] = useState('')
-  const [showBriefing, setShowBriefing] = useState(false)
+  const [showBriefing, setShowBriefing] = useState(true) // Start with briefing
   const [showDebriefing, setShowDebriefing] = useState(false)
+  const [showSprintReport, setShowSprintReport] = useState(false)
+  const [calculatedMetrics, setCalculatedMetrics] = useState<{
+    efficiency: number
+    budgetEarned: number
+    dataQuality: number
+    throughput: number
+  } | null>(null)
   const [hintCount, setHintCount] = useState(0)
   const [startTime] = useState(Date.now())
   const [throughput, setThroughput] = useState(0) // Items processed per second
@@ -86,39 +95,66 @@ export default function PipelinePuzzle({
   }
 
   const handleContinue = () => {
-    setShowDebriefing(true)
+    // Calculate metrics for Sprint Report
+    if (status === 'SUCCESS') {
+      const duration = (Date.now() - startTime) / 1000
+      const calculatedThroughput = duration > 0 ? correctSequence.length / duration : 0
+      const rawDataQuality = calculateRawDataQuality(calculatedThroughput, hintCount, true)
+      const efficiency = Math.min(100, Math.round((calculatedThroughput * 100) / 0.5)) // Normalize to 0-100
+      
+      setCalculatedMetrics({
+        efficiency,
+        budgetEarned: 0, // Not used in Project Genesis
+        dataQuality: rawDataQuality,
+        throughput: calculatedThroughput,
+      })
+      setShowSprintReport(true)
+    }
   }
+
+  const { calculateRawDataQuality, saveStageResult, syncProjectStateToDB } = useGameStore()
 
   const handleReturnToHQ = async () => {
     const penaltyMultiplier = Math.max(0, 1 - hintCount * 0.2)
     const finalXP = Math.floor(level.xpReward * penaltyMultiplier)
     const duration = Math.floor((Date.now() - startTime) / 1000)
-    const calculatedThroughput = duration > 0 ? (correctSequence.length / duration).toFixed(2) : '0'
+    const calculatedThroughput = duration > 0 ? (correctSequence.length / duration) : 0
+    const won = status === 'SUCCESS'
+    
+    // Calculate Raw Data Quality (Project Genesis - Stage 1)
+    const rawDataQuality = won 
+      ? calculateRawDataQuality(calculatedThroughput, hintCount, won)
+      : 0
+    
+    // Save stage result (Stage 1: Source Ingestion)
+    saveStageResult(1, won ? 100 : 0, won, rawDataQuality)
+    await syncProjectStateToDB()
     
     // Save game session with throughput
     await saveGameSession({
       gameType: GAME_TYPES.PIPELINE,
       levelId: level.id,
-      score: status === 'SUCCESS' ? 100 : 0,
+      score: won ? 100 : 0,
       duration,
-      won: status === 'SUCCESS',
+      won,
       xpEarned: finalXP,
       gameConfig: {
         hintCount,
         penaltyMultiplier,
         sequence: slots,
-        throughput: parseFloat(calculatedThroughput),
+        throughput: calculatedThroughput,
+        raw_data_quality: rawDataQuality, // Save for analytics
       },
     })
 
     // Save to leaderboard
-    if (status === 'SUCCESS') {
+    if (won) {
       const { getLeaderboardEntries } = await import('@/app/actions/arcade-actions')
       // Leaderboard will be updated via the game_config
     }
 
     setShowDebriefing(false)
-    onComplete(finalXP, { won: status === 'SUCCESS', score: status === 'SUCCESS' ? 100 : 0 })
+    onComplete(finalXP, { won, score: won ? 100 : 0 })
   }
 
   // Calculate throughput in real-time
@@ -142,32 +178,17 @@ export default function PipelinePuzzle({
         }
       `}</style>
 
-      {showBriefing && (
-        <div className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-800 border-2 border-neon-blue rounded-xl p-8 max-w-lg w-full shadow-[0_0_50px_rgba(0,255,255,0.2)]">
-            <div className="flex items-center gap-3 mb-4 text-neon-blue">
-              <div className="w-16 h-16 rounded-full border-2 border-neon-blue overflow-hidden bg-slate-900">
-                {playerHero ? (
-                  <img src={playerHero.img} alt="Player Hero" className="w-full h-full object-cover" />
-                ) : (
-                  MASCOTS.pipeline && (
-                    <img src={MASCOTS.pipeline} alt="Pipeline Bot" className="w-full h-full object-cover" />
-                  )
-                )}
-              </div>
-              <h2 className="text-2xl font-bold uppercase tracking-wider">Client Request</h2>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">{level.name}</h3>
-            <p className="text-gray-300 mb-8 leading-relaxed text-lg">{level.scenario}</p>
-            <button
-              onClick={() => setShowBriefing(false)}
-              className="w-full bg-neon-blue text-black font-bold py-4 rounded hover:bg-cyan-400 transition-all"
-            >
-              ACCEPT MISSION
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Narrative Briefing (Slack/Email style) */}
+      <StoryModal
+        isOpen={showBriefing}
+        type="briefing"
+        sender="CTO"
+        message={`Hey team! 👋\n\nOur data pipeline is a mess right now. We're losing money because we can't process customer data fast enough.\n\n${level.scenario || 'We need you to clean this up ASAP.'}\n\nIf we can get this pipeline running efficiently, we'll have budget left over to invest in better security infrastructure. Think of it as an investment in our future! 💰`}
+        impact="Reward: Budget earned from this sprint will be available for Server Defense in the next sprint."
+        onClose={() => setShowBriefing(false)}
+        onAction={() => setShowBriefing(false)}
+        actionLabel="ACCEPT TASK"
+      />
 
       <div className="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
         <div>
@@ -292,19 +313,27 @@ export default function PipelinePuzzle({
         </div>
       </div>
 
-      {/* Mission Debriefing Modal */}
-      <StoryModal
-        isOpen={showDebriefing}
-        type="debriefing"
-        topic={GAME_STORIES[GAME_TYPES.PIPELINE]?.topic || 'Mission Complete'}
-        story={GAME_STORIES[GAME_TYPES.PIPELINE]?.impact || 'Mission completed successfully.'}
-        mascot={MASCOTS.pipeline}
-        levelName={level.name}
-        onClose={() => {
-          setShowDebriefing(false)
+      {/* Sprint Report Modal */}
+      {calculatedMetrics && (
+        <StoryModal
+          isOpen={showSprintReport}
+          type="sprint-report"
+          sprintMetrics={calculatedMetrics}
+          onClose={() => {
+            setShowSprintReport(false)
+          }}
+          onAction={handleReturnToHQ}
+          actionLabel="DEPLOY TO PRODUCTION"
+        />
+      )}
+
+      {/* Virtual CTO Companion */}
+      <VirtualCTO
+        currentStage={1}
+        gameContext={{
+          gameType: GAME_TYPES.PIPELINE,
+          status: status === 'SUCCESS' ? 'SUCCESS' : status === 'ERROR' ? 'ERROR' : 'IDLE',
         }}
-        onAction={handleReturnToHQ}
-        actionLabel="RETURN TO HQ"
       />
     </div>
   )

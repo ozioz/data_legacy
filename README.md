@@ -19,7 +19,7 @@ Global liderlik tablolarında yerinizi alın. Diğer veri profesyonelleriyle yar
 
 ### 🎨 İki Farklı Deneyim
 - **Career Mode**: Derinlemesine kariyer simülasyonu - 6 farklı oyun, karakter gelişimi, seviye sistemi
-- **Prompt Lab**: Hızlı oyun modu - AI prompt mühendisliği becerilerinizi test edin
+- **Quick Play**: Hızlı oyun modu - AI prompt mühendisliği becerilerinizi test edin (Visionary, The Algorithm)
 
 ---
 
@@ -86,6 +86,7 @@ Global liderlik tablolarında yerinizi alın. Diğer veri profesyonelleriyle yar
    - `supabase/migrations/add_quant_tools.sql`
    - `supabase/migrations/add_admin_system.sql`
    - `supabase/migrations/add_visionary_levels.sql`
+   - `supabase/migrations/fix_admin_access.sql` (admin yetkisi vermek için)
    - `supabase/rpc_execute_market_transaction.sql`
    - `supabase/rpc_apply_market_news.sql`
 
@@ -125,65 +126,71 @@ Global liderlik tablolarında yerinizi alın. Diğer veri profesyonelleriyle yar
 
 ## 🎮 Oyun Modları
 
-### 🎓 Career Mode (Kariyer Simülasyonu)
+### 🎓 Career Mode - Project Genesis (Kariyer Simülasyonu)
 
-Derinlemesine öğrenme deneyimi. 6 farklı mini-oyun:
+**End-to-End Data Project Simulation**: Gerçek bir veri projesinin tüm aşamalarını simüle eden, hikaye odaklı ilerleme sistemi.
 
-1. **Pipeline Puzzle** 🧩
-   - ETL pipeline'ları tasarlayın
-   - Veri akışını optimize edin
-   - Throughput metriklerinizi geliştirin
+#### Stage 1: Source Ingestion (PipelinePuzzle) 🧩
+- Ham verileri çoklu kaynaklardan çıkarın ve temizleyin
+- Drag-and-drop ile ETL pipeline'ları tasarlayın
+- Throughput metriklerinizi geliştirin
+- `raw_data_quality` skoru hesaplanır (0-100)
 
-2. **Server Guardian** 🛡️
-   - Sistem güvenliğini koruyun
-   - Saldırılara karşı savunun
-   - Roguelite modunda upgrade kartları toplayın
+#### Stage 2: Data Modeling (KimballArchitect) 🏗️
+- Kimball metodolojisi ile Star Schema veri ambarı oluşturun
+- **React Flow Integration**: Professional ERD-style node-based UI
+- Tabloları FACT veya DIMENSION olarak sınıflandırın
+- **Drag-and-Drop Connections**: Kolonlar arası ilişki kurma
+- **Relationship Types**: One-to-One, One-to-Many, Many-to-Many seçimi
+- **Edit/Delete Relationships**: Mevcut ilişkileri düzenleme veya silme
+- **Animated Connections**: Geçerli/geçersiz bağlantılar için görsel geri bildirim
+- `model_integrity` skoru hesaplanır (0-100)
+- Kazanma koşulu: 1 Fact + 3+ Dimension tablosu
 
-3. **Null Runner** 🏃
-   - Sinyal/gürültü ayrımı yapın
-   - Veri kalitesini artırın
-   - Hızlı kararlar verin
+#### Stage 3: Semantic Layer (MetricLab) 📐
+- Block-based formül builder ile iş ölçümleri oluşturun
+- CEO'nun iş isteklerini yanıtlayın (Toplam Gelir, Ortalama Sipariş Değeri, vb.)
+- Fonksiyonlar: SUM, COUNT, AVERAGE, DIVIDE, MULTIPLY, SUBTRACT
+- AI geri bildirimi: Yanlış aggregasyonlar için uyarılar
+- `semantic_layer_score` skoru hesaplanır (0-100)
 
-4. **Data Farm** 🌾
-   - Kaynak üretimi yönetin
-   - Idle mekanikleri kullanın
-   - Ekonomi sistemini öğrenin
+#### Stage 4: Reporting (DashboardCanvas) 📊
+- Drag-and-drop widget'larla veri görselleştirme dashboard'u oluşturun
+- **Recharts Integration**: Gerçek grafikler (Bar Chart, Line Chart, Pie Chart, vb.)
+- Widget tipleri: Bar Chart, Line Chart, KPI Card, Pie Chart, Map
+- **Real Data Visualization**: Tableau/PowerBI benzeri profesyonel deneyim
+- AI değerlendirmesi: Groq ile Readability Score (0-100)
+- Kazanma koşulu: 4 widget ile tüm iş sorularını yanıtlayın (score ≥ 70%)
+- `business_value` skoru hesaplanır (0-100)
 
-5. **Query Master** 📊
-   - SQL sorguları optimize edin
-   - Performans metriklerini iyileştirin
-   - Karmaşık join'leri çözün
+**Virtual CTO Companion**: Tüm stage'lerde sağ alt köşede AI avatar, ipuçları ve rehberlik sağlar.
 
-6. **Behavioral Scenarios** 🎭
-   - AI destekli iş senaryoları
-   - Gerçek dünya kararları
-   - Kariyer koçundan geri bildirim
+**İlerleme Sistemi**: Her stage sırayla açılır. Bir stage'i tamamlamadan diğerine geçemezsiniz.
 
-### ⚡ Prompt Lab (Hızlı Oyun)
+### ⚡ Quick Play (Hızlı Oyun)
 
-AI prompt mühendisliği becerilerinizi test edin:
+Hızlı oyun modları - Kariyer moduna gerek yok:
 
 1. **Visionary** 🎨
    - Görüntü prompt'larını reverse engineer edin
-   - **Zero-Latency**: Database validation (AI maliyeti yok!)
+   - **Dynamic Levels**: Database'den rastgele level yükleme
+   - **AI Analysis**: Admin panelinde AI ile otomatik prompt analizi
    - Prompt Builder UI (Subject, Style, Lighting seçimi)
-   - Her doğru attribute = 33.33 puan
+   - Database validation ile 100% doğruluk kontrolü
    - Zorluk seviyeleri: Easy, Medium, Hard
 
-2. **Agent Handler** 🤖
-   - AI agent araç zincirleri oluşturun
-   - Doğru sıralamayı bulun
-   - Karmaşık görevleri çözün
-
-3. **The Algorithm** 🧮
+2. **The Algorithm** 🧮
    - Kullanıcı persona'larını tahmin edin
    - Öneri sistemlerini anlayın
    - AI değerlendirmesi alın
 
-4. **Coach GPT** ⚽
-   - Stratejik komutlar verin
-   - Oyun simülasyonlarını yönetin
-   - Kazanma/kaybetme senaryolarını test edin
+3. **Neural Chess** ♟️
+   - Satranç oyunu AI'ya karşı (The Monolith)
+   - **Data Engineering Metaforları**: Taşlar Data Engineering bileşenlerini temsil eder
+     - King = Production DB, Queen = LLM Model, Rook = Firewall, Bishop = Data Pipeline, Knight = API Gateway, Pawn = Raw Data
+   - **AI Grandmaster Coach**: Tahta analizi ve Data Engineering tavsiyeleri
+   - **3 Zorluk Seviyesi**: Easy (greedy AI), Medium (Groq FAST_MODEL), Hard (Groq SMART_MODEL)
+   - **Özellikler**: Undo, Hint (3 kere), Resign, Auto-analysis (oyun bitince)
 
 ### 🎤 AI Mock Interview
 
@@ -193,6 +200,16 @@ Gerçekçi iş görüşmeleri:
 - **Speech Recognition**: Konuşarak cevap verin
 - **AI Feedback**: Detaylı SWOT analizi ve öneriler
 - **Emotional Analysis**: Video analizi ile duygusal geri bildirim
+
+### 📜 Data Legacy Passport (Profile)
+
+Paylaşılabilir doğrulama sayfası:
+
+- **Public Profile**: `/profile` - Kimlik doğrulama gerektirmez (authenticated users için)
+- **Skill Matrix**: Radar Chart ile coding_speed, analytical_thinking, crisis_management görselleştirmesi
+- **Project Progress**: Project Genesis tamamlanma durumu ve metrikleri
+- **PDF Resume**: QR code ile canlı passport linki
+- **LinkedIn Sharing**: Tek tıkla LinkedIn'de paylaşım
 
 ---
 
@@ -295,17 +312,17 @@ Sorularınız mı var? Önerileriniz mi var?
 ## 🎯 Roadmap
 
 ### ✅ Tamamlanan
-- Career Mode (6 oyun)
-- Prompt Lab (4 oyun)
+- Career Mode - Project Genesis (4 stage end-to-end simulation)
+- Quick Play (Visionary, The Algorithm, Neural Chess)
 - AI Mock Interview
-- Resume Generator
+- Data Legacy Passport (Profile with Skill Matrix)
+- Virtual CTO Companion
 - Admin System
+- React Flow Integration (Kimball Architect)
+- Recharts Integration (Dashboard Canvas)
 
 ### 🚧 Geliştirme Aşamasında
 - Guild System (sosyal özellikler)
-- Marketplace (ekonomi sistemi)
-- The Core (matematik/algoritma oyunları)
-- Public Profile Verification
 
 ### 🔮 Gelecek
 - Mobile App

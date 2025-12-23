@@ -8,9 +8,16 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { isAdmin, error } = await checkAdminStatus()
+  const result = await checkAdminStatus()
+  
+  console.log('[Admin Layout] Admin check result:', {
+    isAdmin: result.isAdmin,
+    userId: result.userId,
+    error: result.error,
+  })
 
-  if (!isAdmin) {
+  if (!result.isAdmin) {
+    console.log('[Admin Layout] Redirecting to auth page - not admin')
     redirect('/auth?error=admin_required')
   }
 

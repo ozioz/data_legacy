@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { CheckCircle, XCircle, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react'
 import { generateScenario, generateChoiceConsequence } from '@/app/actions/ai-actions'
 import { saveBehavioralChoice, saveGameSession } from '@/app/actions/game-actions'
+import VirtualCTO from '@/components/ui/VirtualCTO'
+import { GAME_TYPES } from '@/lib/game/constants'
 
 interface BehavioralGameProps {
   level: any
@@ -326,6 +328,15 @@ export default function BehavioralGame({
           )}
         </div>
       )}
+
+      {/* Virtual CTO Companion */}
+      <VirtualCTO
+        currentStage={0}
+        gameContext={{
+          gameType: GAME_TYPES.BEHAVIORAL,
+          status: gameState === 'WON' ? 'SUCCESS' : gameState === 'LOST' ? 'ERROR' : 'IDLE',
+        }}
+      />
     </div>
   )
 }

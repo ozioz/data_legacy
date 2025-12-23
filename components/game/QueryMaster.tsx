@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Terminal, Check, X, RotateCcw, Lightbulb, ArrowLeft } from 'lucide-react'
 import { MASCOTS, GAME_STORIES, GAME_TYPES } from '@/lib/game/constants'
 import StoryModal from '@/components/ui/StoryModal'
+import VirtualCTO from '@/components/ui/VirtualCTO'
 import { saveGameSession } from '@/app/actions/game-actions'
 
 interface QueryMasterProps {
@@ -23,9 +24,20 @@ export default function QueryMaster({ level, onComplete, onExit, playerHero }: Q
   const [startTime] = useState(Date.now())
 
   useEffect(() => {
-    const blocks = level.config.blocks || level.config.target.split(' ')
-    setTargetBlocks(level.config.target.split(' '))
-    const shuffled = [...level.config.blocks].sort(() => Math.random() - 0.5)
+    if (!level?.config) {
+      // Default config if not provided
+      const defaultTarget = 'SELECT * FROM users WHERE active = true'
+      const defaultBlocks = ['SELECT', '*', 'FROM', 'users', 'WHERE', 'active', '=', 'true']
+      setTargetBlocks(defaultTarget.split(' '))
+      setAvailableBlocks([...defaultBlocks].sort(() => Math.random() - 0.5))
+      return
+    }
+
+    const target = level.config.target || 'SELECT * FROM users WHERE active = true'
+    const blocks = level.config.blocks || target.split(' ')
+    
+    setTargetBlocks(target.split(' '))
+    const shuffled = [...blocks].sort(() => Math.random() - 0.5)
     setAvailableBlocks(shuffled)
   }, [level])
 
@@ -50,6 +62,12 @@ export default function QueryMaster({ level, onComplete, onExit, playerHero }: Q
   }
 
   const handleExecute = () => {
+    if (!level?.config?.target) {
+      setStatus('ERROR')
+      setMessage('Invalid level configuration.')
+      return
+    }
+
     const target = level.config.target.replace(/\s+/g, ' ').trim()
     const current = selectedBlocks.join(' ').replace(/\s+/g, ' ').trim()
 
@@ -73,7 +91,7 @@ export default function QueryMaster({ level, onComplete, onExit, playerHero }: Q
       won: status === 'WON',
       xpEarned: level.xpReward,
       gameConfig: {
-        target: level.config.target,
+        target: level?.config?.target || 'N/A',
         attempts: 1, // Could track this
       },
     })
@@ -169,7 +187,8 @@ export default function QueryMaster({ level, onComplete, onExit, playerHero }: Q
             <button
               onClick={() => {
                 setSelectedBlocks([])
-                setAvailableBlocks([...level.config.blocks].sort(() => Math.random() - 0.5))
+                const blocks = level?.config?.blocks || level?.config?.target?.split(' ') || []
+                setAvailableBlocks([...blocks].sort(() => Math.random() - 0.5))
                 setStatus('PLAYING')
                 setMessage('')
               }}
@@ -199,6 +218,15 @@ export default function QueryMaster({ level, onComplete, onExit, playerHero }: Q
         }}
         onAction={handleComplete}
         actionLabel="RETURN TO HQ"
+      />
+
+      {/* Virtual CTO Companion */}
+      <VirtualCTO
+        currentStage={0}
+        gameContext={{
+          gameType: GAME_TYPES.QUERY,
+          status: status === 'WON' ? 'SUCCESS' : status === 'ERROR' ? 'ERROR' : 'IDLE',
+        }}
       />
     </div>
   )

@@ -40,9 +40,13 @@ CREATE TABLE IF NOT EXISTS public.guild_members (
 );
 
 -- ============================================================================
--- MARKETPLACE (Economy Features)
+-- MARKETPLACE (Economy Features) - REMOVED: Focus on Data Career Simulation
 -- ============================================================================
+-- NOTE: Marketplace features have been removed to focus strictly on Data Professional Career Simulation.
+-- These tables are commented out for future migration cleanup.
+-- Uncomment if marketplace features are needed in the future.
 
+/*
 -- Market Listings Table
 CREATE TABLE IF NOT EXISTS public.market_listings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -71,6 +75,7 @@ CREATE TABLE IF NOT EXISTS public.user_inventory (
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(user_id, item_type, item_name)
 );
+*/
 
 -- ============================================================================
 -- AI INTERVIEW SESSIONS (Smarter AI Features)
@@ -105,13 +110,15 @@ CREATE INDEX IF NOT EXISTS idx_guilds_total_xp ON public.guilds(total_xp DESC);
 CREATE INDEX IF NOT EXISTS idx_guild_members_guild_id ON public.guild_members(guild_id);
 CREATE INDEX IF NOT EXISTS idx_guild_members_user_id ON public.guild_members(user_id);
 
--- Marketplace indexes
+-- Marketplace indexes - COMMENTED OUT (Marketplace removed)
+/*
 CREATE INDEX IF NOT EXISTS idx_market_listings_seller_id ON public.market_listings(seller_id);
 CREATE INDEX IF NOT EXISTS idx_market_listings_item_type ON public.market_listings(item_type);
 CREATE INDEX IF NOT EXISTS idx_market_listings_status ON public.market_listings(status) WHERE status = 'active';
 CREATE INDEX IF NOT EXISTS idx_market_listings_created_at ON public.market_listings(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_user_inventory_user_id ON public.user_inventory(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_inventory_item_type ON public.user_inventory(item_type);
+*/
 
 -- AI Interview indexes
 CREATE INDEX IF NOT EXISTS idx_ai_interview_sessions_user_id ON public.ai_interview_sessions(user_id);
@@ -132,8 +139,8 @@ WITH (lists = 100);
 -- Enable RLS on all tables
 ALTER TABLE public.guilds ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.guild_members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.market_listings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.user_inventory ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.market_listings ENABLE ROW LEVEL SECURITY; -- COMMENTED OUT (Marketplace removed)
+-- ALTER TABLE public.user_inventory ENABLE ROW LEVEL SECURITY; -- COMMENTED OUT (Marketplace removed)
 ALTER TABLE public.ai_interview_sessions ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
@@ -214,9 +221,9 @@ CREATE POLICY "Users can leave or be removed from guilds"
     );
 
 -- ============================================================================
--- MARKETPLACE POLICIES
+-- MARKETPLACE POLICIES - COMMENTED OUT (Marketplace removed)
 -- ============================================================================
-
+/*
 -- Market Listings: Everyone can view active listings
 DROP POLICY IF EXISTS "Active listings are viewable by everyone" ON public.market_listings;
 CREATE POLICY "Active listings are viewable by everyone"
@@ -270,6 +277,7 @@ DROP POLICY IF EXISTS "Users can delete own inventory" ON public.user_inventory;
 CREATE POLICY "Users can delete own inventory"
     ON public.user_inventory FOR DELETE
     USING (auth.uid() = user_id);
+*/
 
 -- ============================================================================
 -- AI INTERVIEW SESSIONS POLICIES
@@ -373,6 +381,8 @@ CREATE TRIGGER trigger_update_guilds_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
+-- COMMENTED OUT (Marketplace removed)
+/*
 DROP TRIGGER IF EXISTS trigger_update_market_listings_updated_at ON public.market_listings;
 CREATE TRIGGER trigger_update_market_listings_updated_at
     BEFORE UPDATE ON public.market_listings
@@ -384,6 +394,7 @@ CREATE TRIGGER trigger_update_user_inventory_updated_at
     BEFORE UPDATE ON public.user_inventory
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
+*/
 
 -- ============================================================================
 -- VIEWS for Convenience
@@ -406,7 +417,8 @@ LEFT JOIN public.guild_members gm ON g.id = gm.guild_id
 GROUP BY g.id, g.name, g.description, g.total_xp, g.member_count, g.created_at, u.email
 ORDER BY g.total_xp DESC;
 
--- View: Active Market Listings
+-- View: Active Market Listings - COMMENTED OUT (Marketplace removed)
+/*
 CREATE OR REPLACE VIEW public.active_market_listings AS
 SELECT 
     ml.id,
@@ -422,6 +434,7 @@ FROM public.market_listings ml
 LEFT JOIN auth.users u ON ml.seller_id = u.id
 WHERE ml.status = 'active'
 ORDER BY ml.created_at DESC;
+*/
 
 -- ============================================================================
 -- GRANT PERMISSIONS
@@ -429,7 +442,7 @@ ORDER BY ml.created_at DESC;
 
 -- Grant SELECT on views to authenticated users
 GRANT SELECT ON public.guild_leaderboard TO authenticated;
-GRANT SELECT ON public.active_market_listings TO authenticated;
+-- GRANT SELECT ON public.active_market_listings TO authenticated; -- COMMENTED OUT (Marketplace removed)
 
 -- ============================================================================
 -- COMMENTS for Documentation
@@ -437,8 +450,8 @@ GRANT SELECT ON public.active_market_listings TO authenticated;
 
 COMMENT ON TABLE public.guilds IS 'Guilds (social groups) for players to join and collaborate';
 COMMENT ON TABLE public.guild_members IS 'Membership records for guilds';
-COMMENT ON TABLE public.market_listings IS 'Marketplace listings for trading items';
-COMMENT ON TABLE public.user_inventory IS 'User inventory of items and resources';
+-- COMMENT ON TABLE public.market_listings IS 'Marketplace listings for trading items'; -- COMMENTED OUT (Marketplace removed)
+-- COMMENT ON TABLE public.user_inventory IS 'User inventory of items and resources'; -- COMMENTED OUT (Marketplace removed)
 COMMENT ON TABLE public.ai_interview_sessions IS 'AI-powered interview sessions with vector embeddings for semantic search';
 COMMENT ON COLUMN public.ai_interview_sessions.transcript_embedding IS 'Vector embedding for semantic similarity search (1536 dimensions for OpenAI embeddings)';
 

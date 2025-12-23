@@ -54,25 +54,35 @@ function AuthPageContent() {
         if (error) throw error
 
         if (data.user) {
-          // Create user profile
-          const { error: profileError } = await supabase.from('users').upsert({
-            id: data.user.id,
-            email: data.user.email,
-            chosen_class: null,
-            current_level: 1,
-            total_xp: 0,
-            unlocked_levels: [
-              'ENGINEER_1',
-              'SCIENTIST_1',
-              'ANALYST_1',
-              'ENGINEER_BEHAVIORAL_1',
-              'SCIENTIST_BEHAVIORAL_1',
-              'ANALYST_BEHAVIORAL_1',
-            ],
-            is_admin: false,
-          } as any)
+          // Check if user profile already exists
+          const { data: existingUser } = await supabase
+            .from('users')
+            .select('id')
+            .eq('id', data.user.id)
+            .single()
 
-          if (profileError) console.error('Profile creation error:', profileError)
+          if (!existingUser) {
+            // New user - create profile with is_admin: false
+            const { error: profileError } = await supabase.from('users').insert({
+              id: data.user.id,
+              email: data.user.email,
+              chosen_class: null,
+              current_level: 1,
+              total_xp: 0,
+              unlocked_levels: [
+                'ENGINEER_1',
+                'SCIENTIST_1',
+                'ANALYST_1',
+                'ENGINEER_BEHAVIORAL_1',
+                'SCIENTIST_BEHAVIORAL_1',
+                'ANALYST_BEHAVIORAL_1',
+              ],
+              is_admin: false,
+            } as any)
+
+            if (profileError) console.error('Profile creation error:', profileError)
+          }
+          // If user exists, don't update anything (preserve is_admin and other fields)
 
           setMessage('✅ Account created! You can now sign in.')
           setMode('login')
@@ -87,55 +97,78 @@ function AuthPageContent() {
         if (error) throw error
 
         if (data.user) {
-          // Create user profile if doesn't exist
-          const { error: profileError } = await supabase.from('users').upsert({
-            id: data.user.id,
-            email: data.user.email,
-            chosen_class: null,
-            current_level: 1,
-            total_xp: 0,
-            unlocked_levels: [
-              'ENGINEER_1',
-              'SCIENTIST_1',
-              'ANALYST_1',
-              'ENGINEER_BEHAVIORAL_1',
-              'SCIENTIST_BEHAVIORAL_1',
-              'ANALYST_BEHAVIORAL_1',
-            ],
-            is_admin: false,
-          } as any)
+          // Check if user profile already exists
+          const { data: existingUser } = await supabase
+            .from('users')
+            .select('id, is_admin')
+            .eq('id', data.user.id)
+            .single()
 
-          if (profileError) console.error('Profile creation error:', profileError)
+          if (!existingUser) {
+            // New user - create profile with is_admin: false
+            const { error: profileError } = await supabase.from('users').insert({
+              id: data.user.id,
+              email: data.user.email,
+              chosen_class: null,
+              current_level: 1,
+              total_xp: 0,
+              unlocked_levels: [
+                'ENGINEER_1',
+                'SCIENTIST_1',
+                'ANALYST_1',
+                'ENGINEER_BEHAVIORAL_1',
+                'SCIENTIST_BEHAVIORAL_1',
+                'ANALYST_BEHAVIORAL_1',
+              ],
+              is_admin: false,
+            } as any)
+
+            if (profileError) console.error('Profile creation error:', profileError)
+          }
+          // If user exists, don't update anything (preserve is_admin and other fields)
 
           // Check if admin access was requested
           const isAdminRequired = searchParams?.get('error') === 'admin_required'
 
           if (isAdminRequired) {
             // Check admin status after login
-            const { data: userData } = await supabase
+            const { data: userData, error: userDataError } = await supabase
               .from('users')
-              .select('is_admin')
+              .select('is_admin, email')
               .eq('id', data.user.id)
               .single()
 
-            if ((userData as any)?.is_admin) {
+            console.log('[Auth] Admin check:', {
+              userId: data.user.id,
+              email: data.user.email,
+              userData,
+              userDataError,
+              is_admin: (userData as any)?.is_admin,
+              is_admin_type: typeof (userData as any)?.is_admin,
+            })
+
+            // Check if user is admin (handle both boolean true and string 'true')
+            const isAdmin = (userData as any)?.is_admin === true || (userData as any)?.is_admin === 'true'
+
+            if (isAdmin) {
               // User is admin, redirect to the intended admin page
               const redirectPath = localStorage.getItem('admin_redirect') || '/admin'
               localStorage.removeItem('admin_redirect') // Clean up
-              router.push(redirectPath)
-              router.refresh()
+              console.log('[Auth] Redirecting admin to:', redirectPath)
+              // Use window.location for reliable redirect
+              window.location.href = redirectPath
               return
             } else {
               // User is not admin, show error
               localStorage.removeItem('admin_redirect') // Clean up
+              console.log('[Auth] User is not admin:', userData)
               setMessage('❌ This account does not have admin privileges. Please contact an administrator.')
               return
             }
           }
 
           // Default redirect to home
-          router.push('/')
-          router.refresh()
+          window.location.href = '/'
         }
       }
     } catch (error: any) {
@@ -204,24 +237,35 @@ function AuthPageContent() {
 
       // Create user profile if anonymous sign-in worked
       if (data.user) {
-        const { error: profileError } = await supabase.from('users').upsert({
-          id: data.user.id,
-          email: null,
-          chosen_class: null,
-          current_level: 1,
-          total_xp: 0,
-          unlocked_levels: [
-            'ENGINEER_1',
-            'SCIENTIST_1',
-            'ANALYST_1',
-            'ENGINEER_BEHAVIORAL_1',
-            'SCIENTIST_BEHAVIORAL_1',
-            'ANALYST_BEHAVIORAL_1',
-          ],
-          is_admin: false,
-        } as any)
+        // Check if user profile already exists
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', data.user.id)
+          .single()
 
-        if (profileError) console.error('Profile creation error:', profileError)
+        if (!existingUser) {
+          // New user - create profile with is_admin: false
+          const { error: profileError } = await supabase.from('users').insert({
+            id: data.user.id,
+            email: null,
+            chosen_class: null,
+            current_level: 1,
+            total_xp: 0,
+            unlocked_levels: [
+              'ENGINEER_1',
+              'SCIENTIST_1',
+              'ANALYST_1',
+              'ENGINEER_BEHAVIORAL_1',
+              'SCIENTIST_BEHAVIORAL_1',
+              'ANALYST_BEHAVIORAL_1',
+            ],
+            is_admin: false,
+          } as any)
+
+          if (profileError) console.error('Profile creation error:', profileError)
+        }
+        // If user exists, don't update anything (preserve is_admin and other fields)
       }
 
       router.push('/')

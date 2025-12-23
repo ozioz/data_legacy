@@ -1,10 +1,11 @@
 import jsPDF from 'jspdf'
+import QRCode from 'qrcode'
 import type { UserPersona } from '@/app/actions/resume-actions'
 
 /**
  * Generate a professional PDF resume from user persona
  */
-export function generateResumePDF(persona: UserPersona, userId?: string): void {
+export async function generateResumePDF(persona: UserPersona, userId?: string): Promise<void> {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -129,8 +130,8 @@ export function generateResumePDF(persona: UserPersona, userId?: string): void {
     })
   }
 
-  // Verification Link Section
-  if (yPos > pageHeight - 50) {
+  // Verification Link Section with QR Code
+  if (yPos > pageHeight - 60) {
     doc.addPage()
     yPos = margin
   }
@@ -146,29 +147,54 @@ export function generateResumePDF(persona: UserPersona, userId?: string): void {
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
   
-  // Get verification URL
-  let verificationUrl = ''
+  // Get passport URL (changed from verify to profile)
+  let passportUrl = ''
   if (typeof window !== 'undefined' && userId) {
-    verificationUrl = `${window.location.origin}/verify/${userId}`
+    passportUrl = `${window.location.origin}/profile`
   } else if (typeof window !== 'undefined') {
-    // Fallback: try to extract from email or use placeholder
-    const fallbackUserId = persona.email?.split('@')[0] || 'user'
-    verificationUrl = `${window.location.origin}/verify/${fallbackUserId}`
+    passportUrl = `${window.location.origin}/profile`
   } else {
     // Server-side fallback
-    verificationUrl = userId ? `https://data-legacy.app/verify/${userId}` : 'https://data-legacy.app/verify/[userId]'
+    passportUrl = 'https://data-legacy.app/profile'
   }
 
-  const verificationText = `Verify this profile online:`
+  const verificationText = `View live passport online:`
   doc.text(verificationText, margin, yPos)
   yPos += 6
   
-  // Add clickable link (jsPDF 3.x supports text with link)
+  // Add clickable link
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-  doc.text(verificationUrl, margin, yPos, {
-    link: verificationUrl,
+  doc.text(passportUrl, margin, yPos, {
+    link: passportUrl,
   })
-  yPos += 10
+  yPos += 8
+
+  // Generate and add QR Code
+  try {
+    const qrCodeDataUrl = await QRCode.toDataURL(passportUrl, {
+      width: 200,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF',
+      },
+    })
+    
+    // Add QR code image (20mm x 20mm)
+    const qrSize = 20
+    const qrX = pageWidth - margin - qrSize
+    doc.addImage(qrCodeDataUrl, 'PNG', qrX, yPos - 5, qrSize, qrSize)
+    
+    // Add label below QR code
+    doc.setFontSize(7)
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+    doc.text('Scan to view passport', qrX + qrSize / 2, yPos + qrSize + 3, { align: 'center' })
+  } catch (error) {
+    console.error('Error generating QR code:', error)
+    // Continue without QR code if generation fails
+  }
+  
+  yPos += 30
 
   // Footer
   const footerY = pageHeight - 15

@@ -35,12 +35,12 @@ Bu doküman, Data Legacy 2.0 projesinin Türkçe teknik notlarını içerir.
 - ✅ **Level System**: Seviye bazlı ilerleme
 - ✅ **XP & Leaderboard**: Gerçek zamanlı sıralama
 
-#### 2. Prompt Lab (Hızlı Oyun Modu)
-- ✅ **Visionary**: Görüntü prompt reverse engineering (Database validation ile)
-- ✅ **Agent Handler**: AI tool chain builder (drag & drop)
+#### 2. Quick Play (Hızlı Oyun Modu)
+- ✅ **Visionary**: Görüntü prompt reverse engineering (Database validation ile, dinamik level yükleme)
 - ✅ **The Algorithm**: Persona matching game
-- ✅ **Coach GPT**: Sports strategy simulator
+- ✅ **Neural Chess**: Satranç oyunu AI'ya karşı, Data Engineering metaforları ile (King=DB, Queen=LLM, vb.)
 - ✅ **AI Scoring**: Semantic similarity ve AI değerlendirme
+- ✅ **Admin Panel**: `/admin/visionary` - Otomatik level oluşturma ve AI analizi
 
 #### 3. AI Mock Interview
 - ✅ **Multi-language Support**: Türkçe, İngilizce, İspanyolca, Fransızca, Almanca
@@ -53,52 +53,40 @@ Bu doküman, Data Legacy 2.0 projesinin Türkçe teknik notlarını içerir.
 - ✅ **SWOT Analysis**: Detaylı güçlü/zayıf yönler analizi
 - ✅ **Transcript Saving**: Tüm konuşmalar Supabase'de saklanıyor
 
+#### 4. Data Legacy Passport (Profile)
+- ✅ **Public Profile**: `/profile` - Paylaşılabilir doğrulama sayfası
+- ✅ **Skill Matrix**: Radar Chart ile coding_speed, analytical_thinking, crisis_management görselleştirmesi
+- ✅ **Project Progress**: Project Genesis tamamlanma durumu ve metrikleri
+- ✅ **PDF Resume**: QR code ile canlı passport linki
+- ✅ **LinkedIn Sharing**: Tek tıkla LinkedIn'de paylaşım
+
+#### 5. Virtual CTO Companion
+- ✅ **Persistent AI Avatar**: Tüm Project Genesis stage'lerinde sağ alt köşede
+- ✅ **Event-Based Messages**: Oyun durumuna göre otomatik mesajlar
+- ✅ **Hint System**: Tıklayarak AI-generated ipuçları alma
+- ✅ **Integration**: Tüm Project Genesis oyunları, QueryMaster, BehavioralGame
+
 ### 🔒 Admin-Only Modüller (Geliştirme Aşamasında)
 
 ⚠️ **Not**: Aşağıdaki modüller şu anda sadece admin kullanıcılar tarafından erişilebilir. Geliştirme tamamlandığında public yapılacak.
 
-#### 1. The Core (Matematik & Algoritmalar)
-- 🚧 **Matrix Architecture**: Neural network layer connection puzzle
-- 🚧 **Gradient Descent**: Learning rate optimization simulator
-- 🚧 **Educational Visualizations**: İnteraktif öğrenme deneyimi
-
-#### 2. Guilds (Sosyal Sistem)
+#### 1. Guilds (Sosyal Sistem)
 - 🚧 **Guild Creation**: Yeni guild oluşturma
 - 🚧 **Guild List**: Tüm guild'leri görüntüleme
 - 🚧 **Guild Detail**: Detaylı guild sayfası
 - 🚧 **Guild Leaderboard**: Üyelerin XP toplamına göre sıralama
 - 🚧 **Join/Leave**: Guild'e katılma/ayrılma
 
-#### 3. Marketplace (Ekonomi Sistemi)
-- 🚧 **Buy/Sell**: Data Farm kaynaklarını al/sat
-- 🚧 **Live Prices**: Canlı fiyat takibi (simüle edilmiş)
-- 🚧 **Inventory Management**: Kullanıcı envanter yönetimi
-- 🚧 **Quant Tools**: İstatistik öğrenme mini-oyunları
-  - Volatility Analysis (standart sapma hesaplama)
-  - Probability Analysis (Bayes mantığı)
-  - Fee Discount Rewards (doğru cevaplar için %0 işlem ücreti)
-- 🚧 **Dynamic Market News**: AI tarafından üretilen haberler ve fiyat etkileri
-
-#### 4. Profile & Resume Generator
-- 🚧 **User Profile**: Kullanıcı profil sayfası
-- 🚧 **Resume Generator**: Otomatik PDF CV oluşturma
-  - Skills Analysis (oyun performansından)
-  - Soft Skills Assessment
-  - Achievement Tracking
-  - Public Verification Link
-
-#### 5. Public Verification
-- 🚧 **Public Profile Page**: `/verify/[userId]` - Authentication gerektirmez
-- 🚧 **Verified Badge**: "Verified Data Legacy Profile" rozeti
-- 🚧 **Read-Only Stats**: Seviye, XP, Coding Hours, Skills
 
 ### 🛠️ Admin Sistemi
 
 - ✅ **Admin Authentication**: `is_admin` kolonu ile kontrol
 - ✅ **Admin Routes**: `/admin/*` rotaları korumalı
 - ✅ **Admin Layout**: Server-side admin kontrolü
-- ✅ **Visionary Admin Panel**: `/admin/visionary` - Level yönetimi
-- ✅ **Auto-Generate Levels**: Visionary oyunu için otomatik level oluşturma
+- ✅ **Visionary Admin Panel**: `/admin/visionary` - Level yönetimi ve AI analizi
+- ✅ **Auto-Generate Levels**: Visionary oyunu için otomatik level oluşturma (AI ile prompt reverse engineering)
+- ✅ **Admin Navigation**: Navigation'da admin butonu ve in-progress dropdown menüsü
+- ✅ **Session Persistence**: Admin durumu SSR uyumlu olarak korunuyor
 
 ### 🎨 UI/UX Özellikleri
 
@@ -162,6 +150,7 @@ Bu doküman, Data Legacy 2.0 projesinin Türkçe teknik notlarını içerir.
    - `supabase/migrations/add_quant_tools.sql`
    - `supabase/migrations/add_admin_system.sql`
    - `supabase/migrations/add_visionary_levels.sql`
+   - `supabase/migrations/fix_admin_access.sql` (admin yetkisi vermek için)
    - `supabase/rpc_execute_market_transaction.sql`
    - `supabase/rpc_apply_market_news.sql`
 
@@ -197,13 +186,11 @@ Bu doküman, Data Legacy 2.0 projesinin Türkçe teknik notlarını içerir.
 7. **AI Career Coach** feedback alın
 8. XP kazanın, seviye atlayın
 
-#### Prompt Lab
-1. Ana sayfa → **Prompt Lab** seçin
-2. 4 oyundan birini seçin:
-   - **Visionary**: Görüntü prompt reverse engineering
-   - **Agent Handler**: AI tool chain builder
+#### Quick Play
+1. Navigation → **Quick Play** seçin
+2. 2 oyundan birini seçin:
+   - **Visionary**: Görüntü prompt reverse engineering (dinamik level'lar)
    - **The Algorithm**: Persona matching
-   - **Coach GPT**: Sports strategy
 3. Challenge'ı çözün
 4. AI score alın
 5. Leaderboard'da görünün
@@ -306,12 +293,12 @@ data_legacy/
 │   ├── profile/            # User profile (admin-only)
 │   └── verify/             # Public verification (admin-only)
 ├── components/
-│   ├── arcade/             # Prompt Lab games
+│   ├── arcade/             # Quick Play games (Visionary, Algorithm)
 │   ├── core/               # The Core games
 │   ├── game/               # Career Mode games
 │   ├── interview/          # Interview components
 │   ├── market/             # Marketplace components
-│   └── ui/                 # Reusable UI components
+│   └── ui/                 # Reusable UI components (Navigation, Modals, etc.)
 ├── lib/
 │   ├── admin/              # Admin authentication
 │   ├── game/               # Game constants & assets
@@ -441,6 +428,7 @@ npm run lint         # ESLint check
 - Production: `https://datalegacy.netlify.app`
 - Admin Panel: `http://localhost:3000/admin` (admin-only)
 - Visionary Admin: `http://localhost:3000/admin/visionary` (admin-only)
+- Quick Play: `http://localhost:3000/arcade` (public)
 
 ---
 

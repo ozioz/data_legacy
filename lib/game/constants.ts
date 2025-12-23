@@ -37,6 +37,9 @@ export const GAME_TYPES = {
   FARM: 'FARM',
   TOWER: 'TOWER',
   BEHAVIORAL: 'BEHAVIORAL',
+  KIMBALL: 'KIMBALL',
+  METRIC_LAB: 'METRIC_LAB',
+  DASHBOARD: 'DASHBOARD',
 } as const
 
 export const CAREER_PATHS = {
@@ -79,6 +82,27 @@ export const GAME_STORIES = {
       'The Marketing Director is asking a complex question about user churn. You need to write the correct SQL query syntax to retrieve the answer quickly.',
     impact:
       'Query Executed! You extracted the exact insight needed without timing out the database. The marketing team is using your report for the new campaign.',
+  },
+  [GAME_TYPES.KIMBALL]: {
+    topic: 'Data Warehousing & Star Schema Modeling',
+    briefing:
+      'The analytics team needs a proper data warehouse structure. Build a Star Schema following Kimball methodology: 1 Fact table connected to multiple Dimension tables.',
+    impact:
+      'Star Schema Created! Your dimensional model enables fast analytical queries. The BI team can now generate reports in seconds instead of hours.',
+  },
+  [GAME_TYPES.METRIC_LAB]: {
+    topic: 'Semantic Layer & Measure Creation',
+    briefing:
+      'The CEO needs business metrics for the dashboard. Create measures using block-based formulas. Build measures like Total Revenue, Average Order Value, and more.',
+    impact:
+      'Measures Created! Your semantic layer enables business users to create reports without writing SQL. The analytics team saved 10 hours per week.',
+  },
+  [GAME_TYPES.DASHBOARD]: {
+    topic: 'Data Visualization & Storytelling',
+    briefing:
+      'The CEO needs a dashboard to monitor business performance. Choose the right visualizations for each metric. Build a dashboard that tells a clear data story.',
+    impact:
+      'Dashboard Complete! Your visualization choices enable quick decision-making. The executive team can now track KPIs in real-time.',
   },
 } as const
 

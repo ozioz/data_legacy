@@ -17,33 +17,66 @@ export interface AdminCheckResult {
 export async function checkAdminStatus(): Promise<AdminCheckResult> {
   try {
     const supabase = await createServerClient()
+    
+    // First check session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    console.log('[Admin Check] Session:', { 
+      hasSession: !!session, 
+      sessionError: sessionError?.message,
+      userId: session?.user?.id,
+      email: session?.user?.email 
+    })
+
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
 
     if (authError || !user) {
+      console.log('[Admin Check] Not authenticated:', authError?.message || 'No user')
       return { isAdmin: false, userId: null, error: 'Not authenticated' }
     }
+
+    console.log('[Admin Check] Checking user:', { id: user.id, email: user.email })
 
     // Check admin status from database
     const { data: userData, error: dbError } = await supabase
       .from('users')
-      .select('is_admin')
+      .select('is_admin, email')
       .eq('id', user.id)
       .single()
 
     if (dbError) {
-      console.error('Error checking admin status:', dbError)
+      console.error('[Admin Check] Database error:', dbError)
       return { isAdmin: false, userId: user.id, error: dbError.message }
     }
 
+    if (!userData) {
+      console.log('[Admin Check] User not found in database')
+      return { isAdmin: false, userId: user.id, error: 'User profile not found' }
+    }
+
+    const rawIsAdmin = (userData as any).is_admin
+    const isAdminBoolean = rawIsAdmin === true
+    const isAdminString = rawIsAdmin === 'true'
+    const isAdmin = isAdminBoolean || isAdminString
+
+    console.log('[Admin Check] Detailed Result:', {
+      userId: user.id,
+      email: (userData as any).email,
+      rawIsAdmin,
+      rawIsAdminType: typeof rawIsAdmin,
+      isAdminBoolean,
+      isAdminString,
+      finalIsAdmin: isAdmin,
+    })
+
     return {
-      isAdmin: (userData as any)?.is_admin === true,
+      isAdmin,
       userId: user.id,
     }
   } catch (error: any) {
-    console.error('Error in checkAdminStatus:', error)
+    console.error('[Admin Check] Exception:', error)
     return { isAdmin: false, userId: null, error: error.message }
   }
 }

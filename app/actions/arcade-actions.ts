@@ -273,6 +273,11 @@ export async function getVisionaryLevel(
       }
     }
 
+    // Get list of available images from filesystem
+    const { scanVisionaryImages } = await import('./visionary-actions')
+    const scanResult = await scanVisionaryImages()
+    const availableImages = scanResult.success ? scanResult.images : []
+
     // Build query
     let query = supabase.from('visionary_levels_public').select('*')
 
@@ -281,7 +286,7 @@ export async function getVisionaryLevel(
       query = query.eq('difficulty', difficulty)
     }
 
-    // Get random level
+    // Get all levels
     const { data, error } = await query
 
     if (error) {
@@ -293,9 +298,22 @@ export async function getVisionaryLevel(
       return { success: false, level: null, error: 'No levels found. Please add images to /public/assets/visionary/ and run auto-generate.' }
     }
 
-    // Select random level
-    const randomIndex = Math.floor(Math.random() * data.length)
-    const level = data[randomIndex] as VisionaryLevel
+    // Filter to only include levels with images that actually exist
+    const validLevels = data.filter((level: VisionaryLevel) => 
+      availableImages.includes(level.image_path)
+    )
+
+    if (validLevels.length === 0) {
+      return { 
+        success: false, 
+        level: null, 
+        error: 'No valid levels found. Please sync levels in admin panel (/admin/visionary) to create levels for existing images.' 
+      }
+    }
+
+    // Select random level from valid ones
+    const randomIndex = Math.floor(Math.random() * validLevels.length)
+    const level = validLevels[randomIndex] as VisionaryLevel
 
     return { success: true, level }
   } catch (error) {
@@ -432,4 +450,102 @@ export async function calculateIdleResources(gameType: string) {
     return { success: false, resources: 0 }
   }
 }
+
+
+/**
+ * Evaluate dashboard layout using Groq AI
+ */
+export async function evaluateDashboardLayout(
+  widgets: Array<{ type: string; measureId: string | null; dimensionId: string | null }>,
+  measures: Array<{ id: string; name: string; formula: string }>,
+  dimensions: Array<{ id: string; name: string; type: string }>,
+  businessQuestions: Array<{ question: string; recommendedWidget: string[]; requiredMeasure: string; requiredDimension?: string }>
+): Promise<{ score: number; feedback: string }> {
+  const { SMART_MODEL } = await import('@/lib/groq/models')
+
+  const systemPrompt = `You are a Senior Data Visualization Expert evaluating a business dashboard.
+
+Analyze the dashboard layout and provide:
+1. **Readability Score (0-100)**: Based on:
+   - Correct widget type for each metric (e.g., Line Chart for time series, not Pie Chart)
+   - Appropriate use of dimensions (e.g., Date for trends, Category for comparisons)
+   - Visual clarity and best practices
+   
+2. **Feedback**: Specific recommendations for improvement. Be constructive and educational.
+
+Common issues:
+- Pie Chart with 12+ categories = unreadable (use Bar Chart or Line Chart)
+- KPI Card with dimension = inappropriate (KPIs should be single values)
+- Line Chart for categorical data = suboptimal (use Bar Chart)
+- Map without geographic dimension = invalid
+
+Return JSON:
+{
+  "score": 85,
+  "feedback": "Your dashboard is well-structured. However, using a Pie Chart for 12 months of data is unreadable. Consider a Line Chart for time series trends."
+}`
+
+  const widgetDescriptions = widgets.map((w) => {
+    const measure = measures.find((m) => m.id === w.measureId)
+    const dimension = dimensions.find((d) => d.id === w.dimensionId)
+    return {
+      type: w.type,
+      measure: measure?.name || 'None',
+      dimension: dimension?.name || 'None',
+    }
+  })
+
+  const userPrompt = `Dashboard Widgets:
+${JSON.stringify(widgetDescriptions, null, 2)}
+
+Business Questions:
+${JSON.stringify(businessQuestions.map((q) => ({
+  question: q.question,
+  recommendedWidgets: q.recommendedWidget,
+  requiredMeasure: q.requiredMeasure,
+  requiredDimension: q.requiredDimension,
+})), null, 2)}
+
+Evaluate this dashboard and provide a readability score with feedback.`
+
+  try {
+    const completion = await groq.chat.completions.create({
+      model: SMART_MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
+      response_format: { type: 'json_object' },
+    })
+
+    const content = completion.choices[0]?.message?.content
+    if (!content) {
+      throw new Error('No content returned from Groq')
+    }
+
+    const parsed = JSON.parse(content) as {
+      score: number
+      feedback: string
+    }
+
+    return {
+      score: Math.max(0, Math.min(100, Math.round(parsed.score || 0))),
+      feedback: parsed.feedback || 'Dashboard evaluation complete.',
+    }
+  } catch (error) {
+    console.error('Error evaluating dashboard:', error)
+    // Fallback scoring
+    const hasAllWidgets = widgets.length >= 4
+    const allHaveMeasures = widgets.every((w) => w.measureId)
+    const baseScore = hasAllWidgets && allHaveMeasures ? 60 : 30
+
+    return {
+      score: baseScore,
+      feedback: 'Dashboard evaluation completed. AI feedback unavailable.',
+    }
+  }
+}
+
 

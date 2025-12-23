@@ -46,3 +46,14 @@
   box-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
 }
 
+/* React Flow Edge Animation */
+@keyframes dashdraw {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  animation: dashdraw 1s linear infinite;
+}
+

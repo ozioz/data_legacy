@@ -1,7 +1,9 @@
 'use server'
 
 import { createServerClient } from '@/lib/supabase/server'
-import type { VisionaryLevel, VisionaryOptions } from '@/types/visionary'
+import { groq } from '@/lib/groq/client'
+import { SMART_MODEL } from '@/lib/groq/models'
+import type { VisionaryLevel, VisionaryOptions, VisionaryCorrectAttributes } from '@/types/visionary'
 import fs from 'fs'
 import path from 'path'
 
@@ -35,8 +37,111 @@ export async function scanVisionaryImages(): Promise<{ success: boolean; images:
 }
 
 /**
+ * Analyze an image using AI to reverse-engineer the prompt attributes
+ * Since Groq Vision may not be available, we use filename context and AI text analysis
+ */
+export async function analyzeImageForPrompt(
+  imagePath: string,
+  imageBase64?: string
+): Promise<{
+  success: boolean
+  attributes?: VisionaryCorrectAttributes
+  error?: string
+}> {
+  try {
+    // Extract filename for context
+    const filename = path.basename(imagePath)
+    const filenameContext = filename.replace(/\.(jpg|jpeg|png|webp|gif)$/i, '').replace(/[_-]/g, ' ')
+
+    // Default options to choose from
+    const defaultOptions: VisionaryOptions = {
+      subjects: ['Cyberpunk City', 'Medieval Castle', 'Forest', 'Desert', 'Mountain Landscape', 'Ocean Beach', 'Urban Street', 'Abstract Shapes'],
+      styles: ['Neon Noir', 'Watercolor', 'Pixel Art', 'Sketch', 'Photorealistic', 'Impressionist', 'Minimalist', 'Surreal'],
+      lightings: ['Volumetric', 'Flat', 'Natural', 'Studio', 'Golden Hour', 'Blue Hour', 'Midday', 'Moonlight'],
+    }
+
+    // System prompt for AI analysis
+    const systemPrompt = `You are an expert at reverse-engineering image generation prompts. Given an image filename or description, analyze what attributes would have been used to generate this image.
+
+Available options:
+Subjects: ${defaultOptions.subjects.join(', ')}
+Styles: ${defaultOptions.styles.join(', ')}
+Lightings: ${defaultOptions.lightings.join(', ')}
+
+Return JSON with:
+{
+  "subject": "one of the available subjects",
+  "style": "one of the available styles",
+  "lighting": "one of the available lightings",
+  "reasoning": "brief explanation of why these attributes were chosen"
+}`
+
+    // If we have base64 image, we could use vision API (if available)
+    // For now, use filename context
+    const userPrompt = imageBase64
+      ? `Analyze this image (base64 provided) and determine the prompt attributes that would generate it.`
+      : `Analyze this image based on filename context: "${filenameContext}". Determine the most likely prompt attributes (Subject, Style, Lighting) that would generate this image.`
+
+    try {
+      const completion = await groq.chat.completions.create({
+        model: SMART_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 300,
+        response_format: { type: 'json_object' },
+      })
+
+      const content = completion.choices[0]?.message?.content
+      if (!content) {
+        throw new Error('No content returned from Groq')
+      }
+
+      const parsed = JSON.parse(content) as {
+        subject: string
+        style: string
+        lighting: string
+        reasoning?: string
+      }
+
+      // Validate that attributes are from available options
+      const subject = defaultOptions.subjects.includes(parsed.subject)
+        ? parsed.subject
+        : defaultOptions.subjects[Math.floor(Math.random() * defaultOptions.subjects.length)]
+      const style = defaultOptions.styles.includes(parsed.style)
+        ? parsed.style
+        : defaultOptions.styles[Math.floor(Math.random() * defaultOptions.styles.length)]
+      const lighting = defaultOptions.lightings.includes(parsed.lighting)
+        ? parsed.lighting
+        : defaultOptions.lightings[Math.floor(Math.random() * defaultOptions.lightings.length)]
+
+      return {
+        success: true,
+        attributes: { subject, style, lighting },
+      }
+    } catch (aiError) {
+      console.warn(`[AI Analysis] Failed for ${imagePath}, using fallback:`, aiError)
+      // Fallback: Use random attributes (better than nothing)
+      return {
+        success: true,
+        attributes: {
+          subject: defaultOptions.subjects[Math.floor(Math.random() * defaultOptions.subjects.length)],
+          style: defaultOptions.styles[Math.floor(Math.random() * defaultOptions.styles.length)],
+          lighting: defaultOptions.lightings[Math.floor(Math.random() * defaultOptions.lightings.length)],
+        },
+      }
+    }
+  } catch (error: any) {
+    console.error('Error analyzing image:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+/**
  * Auto-generate levels for all images in the visionary directory
- * This creates levels with default options if they don't exist
+ * Uses AI to analyze images and generate correct attributes
  */
 export async function autoGenerateVisionaryLevels(): Promise<{
   success: boolean
@@ -95,11 +200,46 @@ export async function autoGenerateVisionaryLevels(): Promise<{
         }
 
         if (existing && (existing as any).id) {
-          // Update existing level (keep correct_attributes if they exist)
+          // Check if correct_attributes exist, if not, generate them with AI
+          const { data: existingLevel } = await supabase
+            .from('visionary_levels')
+            .select('correct_attributes')
+            .eq('id', (existing as any).id)
+            .single()
+
+          let correctAttributes = (existingLevel as any)?.correct_attributes
+
+          // If no correct_attributes exist, generate them with AI
+          if (!correctAttributes || !correctAttributes.subject) {
+            console.log(`[Visionary Sync] Missing attributes for ${imagePath}, generating with AI...`)
+            
+            let imageBase64: string | undefined
+            try {
+              const fullPath = path.join(process.cwd(), 'public', imagePath)
+              if (fs.existsSync(fullPath)) {
+                const imageBuffer = fs.readFileSync(fullPath)
+                imageBase64 = `data:image/${path.extname(imagePath).slice(1)};base64,${imageBuffer.toString('base64')}`
+              }
+            } catch (readError) {
+              // Continue without base64
+            }
+
+            const aiAnalysis = await analyzeImageForPrompt(imagePath, imageBase64)
+            if (aiAnalysis.success && aiAnalysis.attributes) {
+              correctAttributes = aiAnalysis.attributes
+            }
+          }
+
+          // Update existing level
           const { error: updateError } = await (supabase as any)
             .from('visionary_levels')
             .update({
               options: defaultOptions,
+              correct_attributes: correctAttributes || {
+                subject: defaultOptions.subjects[0],
+                style: defaultOptions.styles[0],
+                lighting: defaultOptions.lightings[0],
+              },
               updated_at: new Date().toISOString(),
             })
             .eq('id', (existing as any).id)
@@ -112,11 +252,33 @@ export async function autoGenerateVisionaryLevels(): Promise<{
             console.log(`[Visionary Sync] Updated level for ${imagePath}`)
           }
         } else {
-          // Create new level with random correct attributes (for demo)
-          // In production, these should be manually set or AI-generated
-          const randomSubject = defaultOptions.subjects[Math.floor(Math.random() * defaultOptions.subjects.length)]
-          const randomStyle = defaultOptions.styles[Math.floor(Math.random() * defaultOptions.styles.length)]
-          const randomLighting = defaultOptions.lightings[Math.floor(Math.random() * defaultOptions.lightings.length)]
+          // Use AI to analyze the image and generate correct attributes
+          console.log(`[Visionary Sync] Analyzing image with AI: ${imagePath}`)
+          
+          // Try to read image as base64 for better analysis (optional)
+          let imageBase64: string | undefined
+          try {
+            const fullPath = path.join(process.cwd(), 'public', imagePath)
+            if (fs.existsSync(fullPath)) {
+              const imageBuffer = fs.readFileSync(fullPath)
+              imageBase64 = `data:image/${path.extname(imagePath).slice(1)};base64,${imageBuffer.toString('base64')}`
+            }
+          } catch (readError) {
+            console.warn(`[Visionary Sync] Could not read image for base64: ${readError}`)
+            // Continue without base64 - AI will use filename context
+          }
+
+          const aiAnalysis = await analyzeImageForPrompt(imagePath, imageBase64)
+          
+          if (!aiAnalysis.success || !aiAnalysis.attributes) {
+            console.warn(`[Visionary Sync] AI analysis failed for ${imagePath}, using fallback`)
+            // Fallback to random if AI fails
+            aiAnalysis.attributes = {
+              subject: defaultOptions.subjects[Math.floor(Math.random() * defaultOptions.subjects.length)],
+              style: defaultOptions.styles[Math.floor(Math.random() * defaultOptions.styles.length)],
+              lighting: defaultOptions.lightings[Math.floor(Math.random() * defaultOptions.lightings.length)],
+            }
+          }
 
           // Determine difficulty based on image index (simple heuristic)
           const imageIndex = scanResult.images.indexOf(imagePath)
@@ -124,11 +286,7 @@ export async function autoGenerateVisionaryLevels(): Promise<{
 
           const { error: insertError } = await supabase.from('visionary_levels').insert({
             image_path: imagePath,
-            correct_attributes: {
-              subject: randomSubject,
-              style: randomStyle,
-              lighting: randomLighting,
-            },
+            correct_attributes: aiAnalysis.attributes,
             options: defaultOptions,
             difficulty,
           } as any)

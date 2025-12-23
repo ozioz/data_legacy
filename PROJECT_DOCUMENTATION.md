@@ -3,10 +3,10 @@
 ## 🎮 Project Overview
 
 **Data Legacy 2.0** is a cutting-edge AI-native gaming platform that combines:
-- **Career Simulation Mode**: Deep learning path with 6 arcade games and AI-powered behavioral scenarios
-- **Prompt Lab (formerly Prompt Arcade)**: Quick-play reverse engineering games for GenAI enthusiasts
-- **The Core**: Math & Algorithms training ground with educational puzzle games
-- **Quant Tools**: Statistics learning integrated into Marketplace
+- **Career Simulation Mode - Project Genesis**: End-to-End Data Project Simulation with 4 sequential stages
+- **Quick Play**: Quick-play games for GenAI enthusiasts (Visionary, The Algorithm, Neural Chess)
+- **AI Mock Interview**: Multi-language interview simulation with speech recognition
+- **Data Legacy Passport**: Public-facing, shareable verification page with skill matrix
 
 Built with Next.js 14, Supabase, and Groq AI (Llama 3) for extreme low-latency AI interactions.
 
@@ -15,32 +15,25 @@ Built with Next.js 14, Supabase, and Groq AI (Llama 3) for extreme low-latency A
 ## 🆕 Latest Features (2026)
 
 ### Public Modules (Available to All Users)
-- ✅ **Career Mode**: Deep learning path with 6 arcade games and AI-powered behavioral scenarios
-- ✅ **Prompt Lab**: Quick-play reverse engineering games for GenAI enthusiasts
+- ✅ **Career Mode - Project Genesis**: End-to-End Data Project Simulation with 4 sequential stages
+  - Stage 1: Source Ingestion (PipelinePuzzle) - Extract and clean raw data
+  - Stage 2: Data Modeling (KimballArchitect) - Build Star Schema data warehouse with React Flow (drag-and-drop ERD, edit/delete relationships)
+  - Stage 3: Semantic Layer (MetricLab) - Create business measures with block-based formulas
+  - Stage 4: Reporting (DashboardCanvas) - Build data visualization dashboard with Recharts
+  - **Virtual CTO Companion**: Persistent AI avatar providing guidance and hints in all stages
+- ✅ **Quick Play**: Quick-play games for GenAI enthusiasts
+  - Visionary: Reverse engineer image generation prompts (dynamic DB levels)
+  - The Algorithm: Guess user persona from recommendations
+  - Neural Chess: Play chess against AI with Data Engineering metaphors (King=DB, Queen=LLM, etc.)
 - ✅ **AI Mock Interview**: Multi-language interview simulation with speech recognition
+- ✅ **Data Legacy Passport**: Public-facing profile page with skill matrix (Radar Chart), project progress, and LinkedIn sharing
 
 ### Admin-Only Modules (In Progress - Development Phase)
 ⚠️ **Note**: The following modules are currently in development and only accessible to admin users. They will be made public once development is complete:
-- 🚧 **The Core**: Math & Algorithms training ground with educational puzzle games
-  - Matrix Architecture: Neural network layer connection puzzle
-  - Gradient Descent: Learning rate optimization simulator
 - 🚧 **Guilds**: Create/join guilds, compete on leaderboards
   - Guild creation and management
   - Guild leaderboards (sum of members' XP)
   - Join/Leave functionality
-- 🚧 **Marketplace**: Buy/sell Data Farm resources, live price tracking
-  - Buy/sell transactions with secure RPC functions
-  - Live price tracking (simulated)
-  - Inventory management
-  - Quant Tools: Statistics learning mini-games
-  - Dynamic Market News: AI-generated headlines affecting prices
-- 🚧 **Profile & Resume**: User profile management and resume generation
-  - User persona analysis from game data
-  - PDF resume generation with verification link
-  - Skills ranking and soft skills assessment
-- 🚧 **Public Verification**: Shareable profile verification pages
-  - Public profile page (`/verify/[userId]`)
-  - Verified badge and read-only stats
 
 **Access Control**: These modules are protected by server-side admin checks in their layout files (`app/*/layout.tsx`). Only users with `is_admin = true` in the `public.users` table can access them. Navigation shows these modules with an "In Progress" badge for admin users only.
 
@@ -52,19 +45,23 @@ Built with Next.js 14, Supabase, and Groq AI (Llama 3) for extreme low-latency A
 - **Transcript Saving**: All conversations saved to Supabase
 - **Optimized API Calls**: Rate limiting, debouncing, caching
 
-### Resume Generator
-- **User Persona Analysis**: Aggregates game data (skills, soft skills, coding hours)
-- **PDF Generation**: Professional resume using jspdf
-- **Skills Ranking**: Top 5 technical skills with percentiles
-- **Soft Skills**: Proficiency levels (Expert/Advanced/Intermediate/Beginner)
-- **Achievements**: Unlocked achievements and certifications
+### Data Legacy Passport (Profile Page)
+- **Public-Facing Profile**: Shareable verification page (`/profile`)
+- **Layout Sections**:
+  - Top: User Avatar, Level, Dynamic Title (based on Project Genesis completion)
+  - Middle: Completed Projects (Project Genesis status, progress metrics, dashboard screenshot placeholder)
+  - Bottom: Skill Matrix (Radar Chart visualizing coding_speed, analytical_thinking, crisis_management)
+- **PDF Resume**: Includes QR code linking to live passport page
+- **LinkedIn Sharing**: Pre-filled post text for easy sharing
+- **AI Observation**: Displays latest AI career insights from `user_aptitude_metrics`
 
-### Global Navigation
-- **Unified Navigation**: Access all features from any page
-- **Responsive Design**: Mobile-friendly hamburger menu
-- **Authentication Aware**: Shows different links for logged-in users
-- **Active Page Highlighting**: Visual feedback for current page
-- **Logo Integration**: Uses centralized asset management
+### Virtual CTO Companion
+- **Persistent AI Avatar**: Bottom-right corner during all Project Genesis stages
+- **States**: `idle`, `thinking`, `warning`, `celebrating`
+- **Event-Based Messages**: Triggers based on game state (e.g., `raw_data_quality` drops below 50%)
+- **Hint System**: Click CTO to ask for AI-generated hints based on current game state
+- **Integration**: Available in all Project Genesis games (PipelinePuzzle, KimballArchitect, MetricLab, DashboardCanvas), QueryMaster, and BehavioralGame
+- **Tech**: Framer Motion for message bubble animations
 
 ### Asset Management System
 - **Centralized Configuration**: `lib/game/assets.ts` - Single source of truth for all visual assets
@@ -143,19 +140,46 @@ Built with Next.js 14, Supabase, and Groq AI (Llama 3) for extreme low-latency A
 
 ## 📁 Project Structure
 
+### Core Game Components
+
+**Career Mode - Project Genesis**:
+- `components/game/CareerMap.tsx` - Pipeline visualization UI with Virtual CTO
+- `components/game/PipelinePuzzle.tsx` - Stage 1: Source Ingestion with Virtual CTO
+- `components/game/KimballArchitect.tsx` - Stage 2: Data Modeling with React Flow (drag-and-drop ERD, edit/delete relationships)
+- `components/game/MetricLab.tsx` - Stage 3: Semantic Layer with Virtual CTO
+- `components/game/DashboardCanvas.tsx` - Stage 4: Reporting with Recharts (real charts)
+- `components/ui/VirtualCTO.tsx` - Persistent AI companion component
+
+**Quick Play**:
+- `components/arcade/VisionaryGame.tsx` - Image prompt reverse engineering (dynamic DB levels)
+- `components/arcade/AlgorithmGame.tsx` - Persona prediction
+- `components/arcade/NeuralChess.tsx` - Chess game with AI Grandmaster Coach (Data Engineering metaphors)
+
+**State Management**:
+- `lib/store/game-store.ts` - Zustand store with `ProjectState` interface
+- `app/actions/game-actions.ts` - Server actions for project progress
+- `app/actions/arcade-actions.ts` - AI evaluation functions (Dashboard)
+- `app/actions/chess-actions.ts` - Neural Chess AI moves and board analysis
+
+**Database Schema**:
+- `career_progress` table: Stores `ProjectState` (raw_data_quality, model_integrity, semantic_layer_score, business_value, current_stage, stages_completed)
+
+## 📁 Project Structure (Legacy)
+
 ```
 data_legacy/
 ├── app/                          # Next.js 14 App Router
 │   ├── actions/                  # Server Actions
 │   │   ├── ai-actions.ts        # Groq AI functions (scenarios, feedback)
 │   │   ├── arcade-actions.ts    # Prompt evaluation, upgrade generation
+│   │   ├── chess-actions.ts     # Neural Chess AI moves and board analysis
 │   │   ├── game-actions.ts      # Game session tracking, leaderboards
 │   │   ├── guild-actions.ts    # Guild operations (create, join, leave)
 │   │   ├── market-actions.ts    # Marketplace operations (buy, sell, inventory)
 │   │   ├── interview-actions.ts # AI Mock Interview (Groq integration)
 │   │   └── resume-actions.ts   # User persona generation for CV
-│   ├── arcade/                  # Prompt Lab Mode
-│   │   └── page.tsx            # Arcade hub with 4 games
+│   ├── arcade/                  # Quick Play Mode
+│   │   └── page.tsx            # Quick Play hub with 2 games (Visionary, The Algorithm)
 │   ├── auth/                    # Authentication
 │   │   ├── page.tsx            # Login page (Email/Anonymous/Guest)
 │   │   └── callback/           # Magic link callback
@@ -164,14 +188,10 @@ data_legacy/
 │   │   ├── page.tsx            # Guild list and leaderboard
 │   │   ├── create/              # Create new guild
 │   │   └── [id]/               # Guild detail page
-│   ├── market/                  # Marketplace
-│   │   └── page.tsx            # Buy/sell items, inventory management
 │   ├── interview/               # AI Mock Interview
 │   │   └── page.tsx            # Interview session setup and execution
-│   ├── core/                    # The Core - Math & Algorithms
-│   │   └── page.tsx            # Core hub with 2 educational games
-│   ├── profile/                 # User Profile
-│   │   └── page.tsx            # Profile view and resume download
+│   ├── profile/                 # Data Legacy Passport
+│   │   └── page.tsx            # Public-facing profile with skill matrix and project progress
 │   ├── verify/                  # Public Resume Verification
 │   │   └── [userId]/           # Public profile page
 │   ├── page.tsx                # Main Career Mode page
@@ -180,11 +200,10 @@ data_legacy/
 │   └── globals.css             # Global styles
 │
 ├── components/
-│   ├── arcade/                 # Prompt Lab Games
-│   │   ├── VisionaryGame.tsx   # Image prompt reverse engineering
-│   │   ├── AgentHandlerGame.tsx # AI agent tool chain builder
-│   │   ├── AlgorithmGame.tsx   # Persona matching game
-│   │   └── CoachGPTGame.tsx    # Sports strategy simulator
+│   ├── arcade/                 # Quick Play Games
+│   │   ├── VisionaryGame.tsx   # Image prompt reverse engineering (dynamic DB levels)
+│   │   ├── AlgorithmGame.tsx  # Persona matching game
+│   │   └── NeuralChess.tsx     # Chess game with AI Grandmaster Coach
 │   ├── game/                   # Career Mode Games
 │   │   ├── ModeSelection.tsx   # Career Mode vs Prompt Lab selection
 │   │   ├── BehavioralGame.tsx  # AI-powered RPG scenarios
@@ -200,16 +219,12 @@ data_legacy/
 │   ├── interview/              # Interview Components
 │   │   ├── InterviewSession.tsx # Video call-style interview UI with Speech API
 │   │   └── AudioWaveform.tsx   # Audio waveform visualization
-│   ├── core/                    # The Core Games
-│   │   ├── MatrixGame.tsx      # Matrix Architecture puzzle
-│   │   └── GradientGame.tsx    # Gradient Descent simulator
-│   ├── market/                  # Marketplace Components
-│   │   └── QuantTools.tsx      # Statistics learning mini-games
 │   └── ui/                     # Reusable UI components
 │       ├── StoryModal.tsx      # Mission briefing/debriefing
 │       ├── CareerCoachModal.tsx # AI feedback modal
 │       ├── GameInstructions.tsx # How to Play modal (Portal-based)
 │       ├── Leaderboard.tsx     # Real-time leaderboard
+│       ├── VirtualCTO.tsx      # Persistent AI companion
 │       └── Navigation.tsx      # Global navigation bar
 │
 ├── lib/
@@ -223,7 +238,7 @@ data_legacy/
 │   │   ├── cache.ts            # In-memory cache for interview responses
 │   │   └── emotion-detector.ts # Facial expression analysis utility
 │   ├── resume/
-│   │   └── pdf-generator.ts   # PDF resume generation (jspdf)
+│   │   └── pdf-generator.ts   # PDF resume generation (jspdf) with QR code
 │   ├── store/
 │   │   └── game-store.ts       # Zustand state management
 │   └── supabase/
@@ -235,10 +250,11 @@ data_legacy/
 │   ├── schema_arcade.sql       # Arcade mode extensions
 │   ├── schema_social_economy.sql # Social & Economy features (Guilds, Marketplace, Interview)
 │   ├── migrations/
-│   │   ├── 2026_upgrade.sql    # Advanced features (Guild Raids, Market News, User Memory)
-│   │   └── add_quant_tools.sql # Quant Tools columns (math_skill_score, fee_discount_expires_at)
-│   ├── rpc_execute_market_transaction.sql # Atomic market transaction RPC
-│   └── rpc_apply_market_news.sql # Market news price update RPC
+│   │   ├── 2026_upgrade.sql    # Advanced features (Guild Raids, User Memory)
+│   │   ├── add_admin_system.sql # Admin system tables and policies
+│   │   ├── add_visionary_levels.sql # Visionary game levels table
+│   │   ├── add_project_genesis_columns.sql # Project Genesis columns (raw_data_quality, model_integrity, etc.)
+│   │   └── fix_admin_access.sql # Grant admin access to users
 │
 └── public/
     └── assets/                 # Game images and mascots
@@ -248,31 +264,36 @@ data_legacy/
 
 ## 🎯 Core Features
 
-### SECTION 1: Prompt Lab (Quick Play Mode)
+### SECTION 1: Quick Play (Formerly Prompt Lab)
 
 #### Game A: Visionary
 - **Mechanic**: Reverse engineer image generation prompts
 - **AI**: Groq evaluates semantic similarity (0-100%)
-- **Data**: Stores attempts in `prompt_battles` table
+- **Data**: Stores attempts in `prompt_battles` table, uses `visionary_levels` for dynamic level loading
 - **UI**: Modern gradient design with responsive layout
+- **Admin Panel**: `/admin/visionary` - Auto-generate levels from image directory with AI analysis
 
-#### Game B: Agent Handler
-- **Mechanic**: Drag-and-drop AI tool chain sequencing
-- **AI**: Evaluates if sequence achieves target outcome
-- **Data**: Uses `tool_chains` table for challenges
-- **UI**: Interactive drag-and-drop interface
-
-#### Game C: The Algorithm
+#### Game B: The Algorithm
 - **Mechanic**: Guess user persona from shopping recommendations
 - **AI**: Persona matching score (1-10 converted to 0-100%)
 - **Data**: Stores persona evaluations
 - **UI**: Shopping cart visualization
 
-#### Game D: Coach GPT
-- **Mechanic**: Write strategic commands for match simulation
-- **AI**: Simulates outcome and rates command effectiveness
-- **Data**: Predicts WIN/LOSS based on tactics
-- **UI**: Sports match state visualization
+#### Game C: Neural Chess
+- **Mechanic**: Play chess against AI (The Monolith) with Data Engineering metaphors
+- **AI**: 
+  - Easy: Greedy algorithm (captures if possible, otherwise random)
+  - Medium: Groq FAST_MODEL for quick analysis
+  - Hard: Groq SMART_MODEL for deep analysis
+- **AI Grandmaster Coach**: Analyzes board position using Data Engineering metaphors
+  - King = Production DB, Queen = LLM Model, Rook = Firewall, Bishop = Data Pipeline, Knight = API Gateway, Pawn = Raw Data
+- **Features**: 
+  - Undo functionality
+  - Hint system (3 hints per game)
+  - Resign option
+  - Auto-analysis when game ends
+  - Cyberpunk-styled modal with loading states
+- **UI**: Custom dark board colors (#1e293b dark, #334155 light), turn indicators, status messages
 
 ### SECTION 2: The Core (Math & Algorithms)
 
@@ -298,7 +319,7 @@ data_legacy/
 ### SECTION 3: Career Mode Optimizations
 
 #### Mode Selection
-- **New Feature**: Choose between Career Mode and Prompt Lab on startup
+- **New Feature**: Choose between Career Mode and Quick Play on startup
 - **UI**: Beautiful gradient cards with hover effects
 - **Flow**: Mode Selection → Hero Selection → Path Selection → Career Map
 
@@ -319,24 +340,29 @@ data_legacy/
 - **Data**: `idle_production` table tracks production rates
 - **Function**: `calculateIdleResources()` RPC function
 
-### SECTION 4: Marketplace Enhancements
+### SECTION 4: Project Genesis Enhancements
 
-#### Quant Tools
-- **Mechanic**: Statistics learning mini-games integrated into Marketplace
-- **Question Types**:
-  - **Volatility Analysis**: Calculate standard deviation from price charts
-  - **Probability Analysis**: Calculate probability of price going up
-- **Visualization**: Recharts library (AreaChart, LineChart)
-- **Rewards**: 10-minute 0% trading fee discount for correct answers
-- **Tracking**: `math_skill_score` column in users table
-- **UI**: Modal overlay with interactive charts
+#### Virtual CTO Companion
+- **Persistent AI Avatar**: Bottom-right corner during all game stages
+- **Event-Based Messages**: Triggers based on game state changes
+- **Hint System**: AI-generated contextual hints via Groq
+- **Integration**: All Project Genesis games, QueryMaster, BehavioralGame
+- **Tech**: Framer Motion animations, Zustand state management
 
-#### Dynamic Market News
-- **AI Generation**: FAST_MODEL generates tech-related headlines
-- **Price Effects**: News automatically affects market prices via RPC
-- **UI**: Scrolling news ticker on Marketplace page
-- **Volatility**: `volatility_index` tracks price fluctuations
-- **RPC Function**: `apply_market_news()` updates active listings
+#### Kimball Architect (React Flow)
+- **Node-Based UI**: React Flow library for professional ERD visualization
+- **Drag-and-Drop Connections**: Connect columns between tables
+- **Relationship Types**: One-to-One, One-to-Many, Many-to-Many selection
+- **Edit/Delete Relationships**: Click on edge to modify or remove
+- **Animated Connections**: Visual feedback for valid/invalid connections
+- **Validation**: Real-time Kimball methodology checks
+
+#### Dashboard Canvas (Recharts)
+- **Real Charts**: Recharts library for actual data visualization
+- **Widget Types**: Bar Chart, Line Chart, KPI Card, Pie Chart, Map
+- **AI Evaluation**: Groq analyzes dashboard readability and correctness
+- **Dummy Data**: Random data generation for preview
+- **Professional Feel**: Tableau/PowerBI-like experience
 
 ---
 
@@ -349,10 +375,11 @@ data_legacy/
 
 ### Arcade Tables
 - `prompt_battles` - User prompts and AI scores
+- `visionary_levels` - Visionary game levels with AI-generated correct attributes
 - `roguelite_decks` - Tower Defense upgrade decks
-- `tool_chains` - Predefined agent challenges
 - `leaderboard_entries` - Enhanced leaderboards
 - `idle_production` - Offline resource tracking
+- `user_aptitude_metrics` - AI career coach metrics (coding_speed, analytical_thinking, crisis_management)
 
 ### Social & Economy Tables
 - `guilds` - Guild information (name, leader, total XP)
@@ -416,8 +443,22 @@ Data Legacy 2.0 uses a **Hybrid Model Strategy** to balance **Latency (Speed)** 
    - **Model**: `FAST_MODEL` (speed-critical)
    - Input: User prompt, target context, game type
    - Output: Score (0-100%), feedback, breakdown
-   - Used by: All 4 Prompt Lab games
+   - Used by: Quick Play games (Visionary, The Algorithm)
    - Latency: <200ms typical
+
+2. **`getAIMove()`** - Neural Chess AI move generation
+   - **Model**: `FAST_MODEL` (Medium) or `SMART_MODEL` (Hard)
+   - Input: FEN string, difficulty level
+   - Output: Best move in UCI format
+   - Used by: Neural Chess game
+   - Latency: <500ms typical
+
+3. **`analyzeBoardPosition()`** - AI Grandmaster Coach board analysis
+   - **Model**: `SMART_MODEL` (deep reasoning)
+   - Input: FEN string, current turn
+   - Output: Data Engineering metaphor-based analysis
+   - Used by: Neural Chess (on-demand or auto on game end)
+   - Latency: ~500-1000ms
 
 2. **`generateUpgradeCards()`** - Dynamic card generation
    - **Model**: `FAST_MODEL` (instant between waves)
@@ -479,9 +520,9 @@ Data Legacy 2.0 uses a **Hybrid Model Strategy** to balance **Latency (Speed)** 
 Mode Selection → Auth → Hero Selection → Path Selection → Career Map → Game → Completion → Career Coach → Career Map
 ```
 
-### Prompt Lab Flow
+### Quick Play Flow
 ```
-Mode Selection → Prompt Lab Hub → Select Game → Play → AI Evaluation → Score → Save → Next Challenge
+Navigation → Quick Play Hub → Select Game (Visionary/The Algorithm/Neural Chess) → Play → AI Evaluation → Score → Save → Next Challenge
 ```
 
 ### The Core Flow
@@ -499,7 +540,7 @@ Marketplace → Quant Tools Button → Analyze Market → Answer Question → Ge
 - **Responsive**: Mobile hamburger menu, desktop horizontal menu
 - **Dynamic Links**: Shows different links based on authentication status
 - **Active State**: Highlights current page
-- **Quick Access**: Direct links to Career Mode, Prompt Lab, The Core, Guilds, Marketplace, Interview, Profile
+- **Quick Access**: Direct links to Career Mode, Quick Play, The Core, Guilds, Marketplace, Interview, Profile
 
 ---
 
@@ -584,8 +625,11 @@ Marketplace → Quant Tools Button → Analyze Market → Answer Question → Ge
 3. ✅ Run `supabase/schema_social_economy.sql` for social & economy features
 4. ✅ Run `supabase/migrations/2026_upgrade.sql` for advanced features (Guild Raids, Market News, User Memory)
 5. ✅ Run `supabase/migrations/add_quant_tools.sql` for Quant Tools (math_skill_score, fee_discount_expires_at)
-6. ✅ Run `supabase/rpc_execute_market_transaction.sql` for market transactions
-7. ✅ Run `supabase/rpc_apply_market_news.sql` for market news price updates
+6. ✅ Run `supabase/migrations/add_admin_system.sql` for admin system
+7. ✅ Run `supabase/migrations/add_visionary_levels.sql` for Visionary game levels
+8. ✅ Run `supabase/migrations/fix_admin_access.sql` to grant admin access (optional, for specific users)
+9. ✅ Run `supabase/rpc_execute_market_transaction.sql` for market transactions
+10. ✅ Run `supabase/rpc_apply_market_news.sql` for market news price updates
 8. ✅ Set environment variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -718,8 +762,12 @@ For issues or questions:
 
 ### Version 2.0 (2026)
 - ✅ Complete migration to Next.js 14
-- ✅ Prompt Lab (4 games) implementation
+- ✅ Quick Play (2 games: Visionary, The Algorithm) - rebranded from Prompt Lab
 - ✅ Career Mode optimizations
+- ✅ Phaser RPG experiment removed (reverted to roadmap UI)
+- ✅ Adaptive AI Coach (Phase 2) - Career path analysis with aptitude metrics
+- ✅ Admin system with protected routes
+- ✅ Navigation optimization (in-progress modules grouped)
 - ✅ **Hybrid Model Strategy** (SMART_MODEL, FAST_MODEL, AUDIO_MODEL)
 - ✅ AI integration with Groq (optimized model selection)
 - ✅ Real-time leaderboards
@@ -739,6 +787,9 @@ For issues or questions:
 - ✅ **Quant Tools** - Statistics learning in Marketplace
 - ✅ **Dynamic Market News** - AI-generated headlines with price effects
 - ✅ **Advanced Schema** - Guild Raids, User Memory (ready for future implementation)
+- ✅ **Project Genesis** - End-to-End Data Project Simulation (4 stages: PipelinePuzzle, KimballArchitect, MetricLab, DashboardCanvas)
+- ✅ **Neural Chess** - Chess game with AI Grandmaster Coach using Data Engineering metaphors (Quick Play)
+- ✅ **Dashboard Canvas** - Data visualization dashboard builder with AI evaluation
 
 ---
 

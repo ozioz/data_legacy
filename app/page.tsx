@@ -6,11 +6,10 @@ import HeroSelection from '@/components/game/HeroSelection'
 import PathSelection from '@/components/game/PathSelection'
 import CareerMap from '@/components/game/CareerMap'
 import PipelinePuzzle from '@/components/game/PipelinePuzzle'
-import ServerGuardian from '@/components/game/ServerGuardian'
-import ServerGuardianRoguelite from '@/components/game/ServerGuardianRoguelite'
-import NullRunner from '@/components/game/NullRunner'
-import DataFarm from '@/components/game/DataFarm'
 import QueryMaster from '@/components/game/QueryMaster'
+import KimballArchitect from '@/components/game/KimballArchitect'
+import MetricLab from '@/components/game/MetricLab'
+import DashboardCanvas from '@/components/game/DashboardCanvas'
 import BehavioralGame from '@/components/game/BehavioralGame'
 import StoryModal from '@/components/ui/StoryModal'
 import CareerCoachModal from '@/components/ui/CareerCoachModal'
@@ -209,25 +208,24 @@ export default function HomePage() {
     const commonProps = {
       level: currentLevel,
       onComplete: handleGameComplete,
-      onExit: () => setGameState('CAREER_MAP'),
+      onExit: () => {
+        setGameState('CAREER_MAP')
+        setCurrentLevel(null)
+      },
       playerHero: heroData,
     }
 
     switch (currentLevel.gameType) {
       case GAME_TYPES.PIPELINE:
         return <PipelinePuzzle {...commonProps} />
-      case GAME_TYPES.TOWER:
-        // Use roguelite version if level config has roguelite flag
-        if (currentLevel.config?.roguelite) {
-          return <ServerGuardianRoguelite {...commonProps} />
-        }
-        return <ServerGuardian {...commonProps} />
-      case GAME_TYPES.RUNNER:
-        return <NullRunner {...commonProps} />
-      case GAME_TYPES.FARM:
-        return <DataFarm {...commonProps} />
       case GAME_TYPES.QUERY:
         return <QueryMaster {...commonProps} />
+      case GAME_TYPES.KIMBALL:
+        return <KimballArchitect {...commonProps} />
+      case GAME_TYPES.METRIC_LAB:
+        return <MetricLab {...commonProps} />
+      case GAME_TYPES.DASHBOARD:
+        return <DashboardCanvas {...commonProps} />
       case GAME_TYPES.BEHAVIORAL:
         return <BehavioralGame {...commonProps} />
       default:
@@ -244,12 +242,6 @@ export default function HomePage() {
     switch (currentLevel.gameType) {
       case GAME_TYPES.PIPELINE:
         return MASCOTS.pipeline
-      case GAME_TYPES.TOWER:
-        return MASCOTS.defense
-      case GAME_TYPES.RUNNER:
-        return MASCOTS.runner
-      case GAME_TYPES.FARM:
-        return MASCOTS.farm
       case GAME_TYPES.QUERY:
         return MASCOTS.query
       default:
@@ -345,25 +337,17 @@ export default function HomePage() {
           type="briefing"
           topic={
             currentLevel.gameType === GAME_TYPES.PIPELINE
-              ? 'ETL Pipelines & Data Lineage'
-              : currentLevel.gameType === GAME_TYPES.TOWER
-                ? 'System Reliability & Security (SRE)'
-                : currentLevel.gameType === GAME_TYPES.FARM
-                  ? 'Data Quality & Maturity Models'
-                  : currentLevel.gameType === GAME_TYPES.RUNNER
-                    ? 'Machine Learning: Overfitting vs. Generalization'
-                    : 'SQL Optimization & Syntax'
+              ? 'Source Ingestion - ETL Pipelines & Data Lineage'
+              : currentLevel.gameType === GAME_TYPES.QUERY
+                ? 'Data Modeling - SQL Optimization & Kimball Methodology'
+                : 'Project Genesis'
           }
           story={
             currentLevel.gameType === GAME_TYPES.PIPELINE
-              ? 'The CEO needs the Sales Dashboard updated immediately. The data is messy. You must build a robust pipeline to extract, transform, and load the data correctly.'
-              : currentLevel.gameType === GAME_TYPES.TOWER
-                ? "It's Black Friday! Traffic is spiking, and malicious bots are attacking our Production Database. Deploy defenses to keep the system uptime at 99.9%."
-                : currentLevel.gameType === GAME_TYPES.FARM
-                  ? "We have raw data seeds, but they are useless without care. Cultivate the data through the 'Bronze', 'Silver', and 'Gold' layers to make it consumable for analytics."
-                  : currentLevel.gameType === GAME_TYPES.RUNNER
-                    ? "You are training a new AI model. You must collect valid 'Signals' (Green) while ignoring the 'Noise' (Red). Be careful not to Overfit!"
-                    : 'The Marketing Director is asking a complex question about user churn. You need to write the correct SQL query syntax to retrieve the answer quickly.'
+              ? 'Extract and clean raw data from multiple sources. Build a robust pipeline to ensure data quality for downstream processing.'
+              : currentLevel.gameType === GAME_TYPES.QUERY
+                ? 'Build dimensional models using Kimball methodology. Create fact and dimension tables that support business reporting needs.'
+                : 'Complete the stage to unlock the next phase of Project Genesis.'
           }
           mascot={getMascot() || ''}
           levelName={currentLevel.name}

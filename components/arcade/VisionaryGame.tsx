@@ -212,6 +212,7 @@ export default function VisionaryGame() {
                   alt="Visionary challenge image"
                   fill
                   className="object-contain"
+                  unoptimized
                   onError={(e) => {
                     // Fallback if image doesn't exist
                     const target = e.target as HTMLImageElement
@@ -223,9 +224,9 @@ export default function VisionaryGame() {
                         'absolute inset-0 flex items-center justify-center text-gray-500 text-center p-4'
                       placeholder.innerHTML = `
                         <div>
-                          <p class="text-lg font-semibold mb-2">Image Placeholder</p>
+                          <p class="text-lg font-semibold mb-2">Image Not Found</p>
                           <p class="text-sm">Image path: ${currentLevel.image_path}</p>
-                          <p class="text-xs mt-2 text-gray-400">Add this image to /public${currentLevel.image_path}</p>
+                          <p class="text-xs mt-2 text-gray-400">Please ensure the image exists at: /public${currentLevel.image_path}</p>
                         </div>
                       `
                       parent.appendChild(placeholder)
